@@ -103,7 +103,7 @@
                 <i data-lucide="chevron-left"></i>
             </button>
             <div id="header-spacer-left" class="w-8"></div>
-            <h1 class="font-extrabold text-3xl md:text-4xl tracking-tight text-white leading-none">VTMCred</h1>
+            <h1 onclick="setState({step: 'hub'})" class="font-extrabold text-3xl md:text-4xl tracking-tight text-white leading-none cursor-pointer active:scale-95 transition-transform">VTMCred</h1>
             <div id="header-spacer-right" class="w-8"></div>
         </div>
         <div class="flex justify-center" id="header-subtitle-container">
@@ -386,6 +386,11 @@
                                 <i data-lucide="lock" class="text-slate-300 lucide-small"></i>
                             </div>
                         </div>
+                        <div class="text-center mt-4">
+                            <a href="https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent('Olá! Vim pelo site da VTMCred e gostaria de mais informações.')}" target="_blank" class="text-slate-400 hover:text-[#3483FA] text-xs font-medium transition-colors inline-block active:scale-95">
+                                Precisa de ajuda? <span class="underline">Fale comigo no WhatsApp</span>
+                            </a>
+                        </div>
                     </div>
                 `;
             } else if (state.step === 'welcome') {
@@ -492,10 +497,10 @@
                         <p class="text-[13px] text-slate-500 font-medium px-1 mb-4 leading-relaxed">Selecione o parcelamento que deseja e clique em Enviar pelo WhatsApp.</p>
                         <div class="flex flex-col gap-2 overflow-y-auto max-h-[420px] pr-1 custom-scrollbar">
                             ${simList.map(sim => `
-                                <div onclick="setState({selectedInstallment: ${sim.months}})" class="bg-white p-4 rounded-lg border transition-all active:scale-[0.98] cursor-pointer ${state.selectedInstallment === sim.months ? 'border-[#3483FA] ring-1 ring-[#3483FA]' : 'border-slate-200'}">
+                                <div onclick="setState({selectedInstallment: ${sim.months}}); setTimeout(() => document.getElementById('wa-btn-loan')?.scrollIntoView({behavior: 'smooth', block: 'center'}), 100)" class="bg-white p-4 rounded-lg border transition-all active:scale-[0.98] cursor-pointer ${state.selectedInstallment === sim.months ? 'border-[#3483FA] ring-1 ring-[#3483FA]' : 'border-slate-200'}">
                                     <div class="flex justify-between items-center mb-1">
                                         <span class="text-md font-bold">${sim.months}x Parcelas</span>
-                                        <span class="text-xs text-slate-400">Total: ${formatBRL(sim.total)}</span>
+                                        <span class="text-xs text-slate-400">${formatBRL(sim.total)}</span>
                                     </div>
                                     <div class="text-2xl font-bold text-[#333333]">${formatBRL(sim.inst)}</div>
                                 </div>
@@ -503,7 +508,7 @@
                         </div>
                         ${state.selectedInstallment ? `
                             <div class="mt-auto pt-6 border-t border-slate-200">
-                                <button onclick="handleSendWA()" class="w-full bg-[#25D366] text-white py-5 rounded-md flex items-center justify-center gap-3 text-lg font-bold shadow-lg active:scale-95 transition-all">
+                                <button id="wa-btn-loan" onclick="handleSendWA()" class="w-full bg-[#25D366] text-white py-5 rounded-md flex items-center justify-center gap-3 text-lg font-bold shadow-lg active:scale-95 transition-all">
                                     <i data-lucide="message-circle" class="lucide-large"></i> Enviar pelo WhatsApp
                                 </button>
                             </div>
@@ -515,10 +520,14 @@
                 content = `
                     <div class="flex flex-col gap-6 pt-6 step-transition">
                         <h2 class="text-lg font-bold px-1 text-slate-400 uppercase tracking-tight">Qual a bandeira?</h2>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 gap-3">
                             ${brands.map(brand => `
-                                <button onclick="setState({cardBrand: '${brand}', step: 'card_bank'})" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm font-bold text-slate-700 hover:border-[#3483FA] active:scale-95 transition-all text-center">
-                                    ${brand}
+                                <button onclick="setState({cardBrand: '${brand}', step: 'card_bank'})" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between font-bold text-slate-700 hover:border-[#3483FA] active:scale-95 transition-all">
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="credit-card" class="text-slate-400 lucide-small"></i>
+                                        ${brand}
+                                    </div>
+                                    <i data-lucide="chevron-right" class="text-slate-300 lucide-small"></i>
                                 </button>
                             `).join('')}
                         </div>
@@ -623,16 +632,16 @@
                                             const total = state.cardAmount * (1 + rate);
                                             const instValue = total / m;
                                             return `
-                                                <div onclick="setState({cardInstallment: ${m}})" class="p-4 rounded-xl border-2 transition-all cursor-pointer text-left ${state.cardInstallment === m ? 'border-fintech-royal bg-blue-50' : 'border-slate-100 hover:border-slate-200'}">
+                                                <div onclick="setState({cardInstallment: ${m}}); setTimeout(() => document.getElementById('wa-btn-card')?.scrollIntoView({behavior: 'smooth', block: 'center'}), 100)" class="p-4 rounded-xl border-2 transition-all cursor-pointer text-left ${state.cardInstallment === m ? 'border-fintech-royal bg-blue-50' : 'border-slate-100 hover:border-slate-200'}">
                                                     <div class="flex justify-between items-center mb-1">
                                                         <span class="font-black text-lg">${m}x de ${formatBRL(instValue)}</span>
-                                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Total: ${formatBRL(total)}</span>
+                                                        <span class="text-[10px] font-bold text-slate-400 uppercase">${formatBRL(total)}</span>
                                                     </div>
                                                 </div>
                                             `;
                                         }).join('')}
                                     </div>
-                                    <button onclick="handleSendCardWA()" ${!state.cardInstallment ? 'disabled' : ''} class="w-full bg-[#25D366] text-white py-5 rounded-xl flex items-center justify-center gap-3 text-lg font-bold shadow-lg active:scale-95 transition-all disabled:opacity-50 mt-4">
+                                    <button id="wa-btn-card" onclick="handleSendCardWA()" ${!state.cardInstallment ? 'disabled' : ''} class="w-full bg-[#25D366] text-white py-5 rounded-xl flex items-center justify-center gap-3 text-lg font-bold shadow-lg active:scale-95 transition-all disabled:opacity-50 mt-4">
                                         <i data-lucide="message-circle" class="lucide-large"></i> Chamar no WhatsApp
                                     </button>
                                 </div>
@@ -660,7 +669,7 @@
             const total = Math.round(state.amount * (1 + currentRate * months));
             const inst = Math.round(total / months);
             
-            const msg = `Fiz uma simulação no *VTMCred*.\n\nResumo da simulação:\n\n* Valor: *${formatBRL(state.amount)}*\n* Parcelamento: *${months}* parcelas de *${formatBRL(inst)}*\n* Total: *${formatBRL(total)}*\n\nGostaria de seguir com a contratação.`;
+            const msg = `Fiz uma simulação no *VTMCred*.\n\nResumo da simulação:\n\n* Valor: *${formatBRL(state.amount)}*\n* Parcelamento: *${months}x* de *${formatBRL(inst)}*\n* Total: *${formatBRL(total)}*\n\nGostaria de seguir com a contratação.`;
             window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
