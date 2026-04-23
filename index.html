@@ -13,18 +13,24 @@
         }
         html, body {
             overflow-x: hidden;
+            max-width: 100%;
             width: 100%;
             margin: 0;
             padding: 0;
             position: relative;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            touch-action: pan-y;
         }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #F8F9FA;
             color: #333333;
-            max-width: 100vw;
+        }
+        header, main, footer {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
         }
         .bg-fintech-royal {
             background-color: #002BFF;
@@ -262,6 +268,8 @@
         };
 
         // --- View Injection ---
+        let currentRenderedStep = null;
+
         const render = () => {
             const container = document.getElementById('app-container');
             const subtitleContainer = document.getElementById('header-subtitle-container');
@@ -275,22 +283,45 @@
             if (state.step === 'hub') {
                 btnBack.classList.add('hidden');
                 spacerLeft.classList.remove('hidden');
-                subtitleContainer.innerHTML = `<span id="animated-slogan" class="text-white/80 text-[10px] uppercase tracking-[0.15em] font-medium text-center min-h-[1em]"></span>`;
-                startSloganAnimation();
+                if (!document.getElementById('animated-slogan')) {
+                    subtitleContainer.innerHTML = `<span id="animated-slogan" class="text-white/80 text-[10px] uppercase tracking-[0.15em] font-medium text-center min-h-[1em]"></span>`;
+                    startSloganAnimation();
+                }
             } else {
                 stopSloganAnimation();
                 btnBack.classList.remove('hidden');
                 spacerLeft.classList.add('hidden');
-                subtitleContainer.innerHTML = `
-                    <div class="inline-flex bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 items-center gap-2 border border-white/20">
-                        <div class="w-4 h-4 rounded-full border-2 border-white flex items-center justify-center">
-                            <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                // Only update subtitle if it's not the slogan or if subtitle changed
+                const currentSubtitleText = subtitleContainer.innerText;
+                if (!currentSubtitleText || currentSubtitleText !== headerSubtitle) {
+                    subtitleContainer.innerHTML = `
+                        <div class="inline-flex bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 items-center gap-2 border border-white/20">
+                            <div class="w-4 h-4 rounded-full border-2 border-white flex items-center justify-center">
+                                <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                            </div>
+                            <span class="text-white/90 text-xs uppercase tracking-widest leading-none">${headerSubtitle}</span>
                         </div>
-                        <span class="text-white/90 text-xs uppercase tracking-widest leading-none">${headerSubtitle}</span>
-                    </div>
-                `;
+                    `;
+                }
             }
 
+            // Optimization: Don't re-render the whole app-container if the step hasn't changed
+            // This prevents losing focus on inputs while typing if something else calls render()
+            if (currentRenderedStep === state.step) {
+                // However, we might need to update specific bits like the amount-input-continue-button
+                if(state.step === 'amount') {
+                    const btn = document.getElementById('loan-btn-continue');
+                    if(btn) btn.disabled = !state.amount || state.amount <= 0;
+                }
+                if(state.step === 'card_amount') {
+                    const btn = document.getElementById('card-btn-continue');
+                    if(btn) btn.disabled = !state.cardAmount || state.cardAmount <= 0;
+                }
+                return;
+            }
+            
+            currentRenderedStep = state.step;
+            
             // Main Content Area
             let content = '';
 
