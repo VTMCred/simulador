@@ -8,23 +8,25 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-            max-width: 100%;
-            overflow-wrap: break-word;
-            min-width: 0;
+        /* Definitive Horizontal Scroll Fix */
+        * {
+            box-sizing: border-box !important;
+            margin: 0;
+            padding: 0;
         }
+
         html, body {
             overflow-x: hidden !important;
+            max-width: 100% !important;
             width: 100% !important;
+            position: relative;
             margin: 0 !important;
             padding: 0 !important;
-            position: relative;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            -webkit-overflow-scrolling: touch;
             touch-action: pan-y;
-            scroll-behavior: smooth;
         }
+
+        /* Essential Reset */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #F8F9FA;
@@ -32,25 +34,30 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
+            overflow-wrap: break-word;
         }
+
+        /* Container Hardening */
         header, main, footer {
             width: 100% !important;
             max-width: 100% !important;
+            overflow-x: hidden !important;
+            overflow-x: clip !important; /* Use clip where supported for extra safety */
+            flex-shrink: 0;
             margin-left: auto !important;
             margin-right: auto !important;
-            overflow-x: hidden !important;
-            flex-shrink: 0;
         }
-        .bg-fintech-royal {
-            background-color: #002BFF;
+
+        #app-container {
+            max-width: 448px !important; /* 28rem = max-w-md */
+            width: 100% !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
         }
-        .text-fintech-royal {
-            color: #002BFF;
-        }
-        .border-fintech-royal {
-            border-color: #002BFF;
-        }
+
+        .bg-fintech-royal { background-color: #002BFF; }
+        .text-fintech-royal { color: #002BFF; }
+        .border-fintech-royal { border-color: #002BFF; }
         .custom-scrollbar::-webkit-scrollbar {
             width: 4px;
         }
@@ -97,8 +104,8 @@
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Header -->
-    <header class="bg-fintech-royal pt-10 pb-5 px-6 sticky top-0 z-50 shadow-md">
-        <div class="flex items-center justify-between mb-3 max-w-md mx-auto w-full">
+    <header class="bg-fintech-royal pt-10 pb-5 px-6 sticky top-0 z-50 shadow-md w-full">
+        <div class="flex items-center justify-between mb-3 max-w-md mx-auto w-full relative">
             <button id="btn-back" class="p-2 -ml-2 text-white hidden">
                 <i data-lucide="chevron-left"></i>
             </button>
@@ -371,7 +378,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <h3 class="font-bold text-lg text-slate-800">Simulador Cartão</h3>
-                                    <p class="text-sm text-slate-500">Converta seu limite em PIX com condições transparentes.</p>
+                                    <p class="text-sm text-slate-500">Converta seu limite em PIX com condições claras.</p>
                                 </div>
                                 <i data-lucide="chevron-right" class="text-slate-300 lucide-small"></i>
                             </button>
