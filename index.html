@@ -12,11 +12,11 @@
             box-sizing: border-box;
         }
         html, body {
-            overflow-x: hidden;
-            max-width: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
+            overflow-x: hidden !important;
+            max-width: 100vw !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
             position: relative;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -28,9 +28,9 @@
             color: #333333;
         }
         header, main, footer {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
         }
         .bg-fintech-royal {
             background-color: #002BFF;
@@ -308,10 +308,18 @@
             // Optimization: Don't re-render the whole app-container if the step hasn't changed
             // This prevents losing focus on inputs while typing if something else calls render()
             if (currentRenderedStep === state.step) {
-                // However, we might need to update specific bits like the amount-input-continue-button
+                // Update specific bits for the current step to keep it interactive without redraw
                 if(state.step === 'amount') {
                     const btn = document.getElementById('loan-btn-continue');
                     if(btn) btn.disabled = !state.amount || state.amount <= 0;
+                }
+                if(state.step === 'key') {
+                    const isKeyActive = state.credKey.toUpperCase() === DISCOUNT_KEY;
+                    const banner = document.getElementById('credkey-success-banner');
+                    if(banner) {
+                        if(isKeyActive) banner.classList.remove('hidden');
+                        else banner.classList.add('hidden');
+                    }
                 }
                 if(state.step === 'card_amount') {
                     const btn = document.getElementById('card-btn-continue');
