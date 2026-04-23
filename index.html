@@ -8,6 +8,11 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #F8F9FA;
@@ -95,6 +100,101 @@
         const DISCOUNT_KEY = "VTMCLIENTE4";
         const PHONE_NUMBER = "5593996589790";
 
+        const SLOGAN_PHRASES = [
+            "Compromisso claro, Crédito direto.",
+            "Simples, rápido e sem burocracia.",
+            "Seu limite pode virar dinheiro.",
+            "Simule e resolva agora.",
+            "Transparência em cada parcela."
+        ];
+
+        // --- Scramble Effect Logic ---
+        class TextScrambler {
+            constructor(el) {
+                this.el = el;
+                this.chars = '$%&¥€£0123456789#¢______';
+                this.update = this.update.bind(this);
+            }
+            setText(newText) {
+                const oldText = this.el.innerText || "";
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise((resolve) => (this.resolve = resolve));
+                this.queue = [];
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 10);
+                    const end = start + Math.floor(Math.random() * 20);
+                    this.queue.push({ from, to, start, end });
+                }
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+            update() {
+                let output = '';
+                let complete = 0;
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) {
+                            char = this.randomChar();
+                            this.queue[i].char = char;
+                        }
+                        output += `<span class="opacity-40 font-mono">${char}</span>`;
+                    } else {
+                        output += from;
+                    }
+                }
+                this.el.innerHTML = output;
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+            randomChar() {
+                return this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+        }
+
+        let scrambler = null;
+        let phraseIndex = 0;
+        let sloganInterval = null;
+
+        const startSloganAnimation = () => {
+            const el = document.getElementById('animated-slogan');
+            if (!el) return;
+            
+            // Avoid multiple intervals
+            if (sloganInterval) return;
+
+            scrambler = new TextScrambler(el);
+            
+            const nextPhrase = () => {
+                scrambler.setText(SLOGAN_PHRASES[phraseIndex]).then(() => {
+                    sloganInterval = setTimeout(nextPhrase, 3000);
+                });
+                phraseIndex = (phraseIndex + 1) % SLOGAN_PHRASES.length;
+            };
+
+            nextPhrase();
+        };
+
+        const stopSloganAnimation = () => {
+            if (sloganInterval) {
+                clearTimeout(sloganInterval);
+                sloganInterval = null;
+            }
+            phraseIndex = 0;
+            scrambler = null;
+        };
+
         const APROXIMACAO_RATES = {
             1: 0.06, 2: 0.12, 3: 0.18, 4: 0.22, 5: 0.26, 6: 0.29,
             7: 0.31, 8: 0.33, 9: 0.34, 10: 0.348, 11: 0.352, 12: 0.356
@@ -120,6 +220,7 @@
 
         const setState = (updates) => {
             state = { ...state, ...updates };
+            window.scrollTo(0, 0); // Always reset scroll to top on step change
             render();
         };
 
@@ -156,8 +257,10 @@
             if (state.step === 'hub') {
                 btnBack.classList.add('hidden');
                 spacerLeft.classList.remove('hidden');
-                subtitleContainer.innerHTML = `<span class="text-white/80 text-[10px] uppercase tracking-[0.15em] font-medium text-center">${headerSubtitle}</span>`;
+                subtitleContainer.innerHTML = `<span id="animated-slogan" class="text-white/80 text-[10px] uppercase tracking-[0.15em] font-medium text-center min-h-[1em]"></span>`;
+                startSloganAnimation();
             } else {
+                stopSloganAnimation();
                 btnBack.classList.remove('hidden');
                 spacerLeft.classList.add('hidden');
                 subtitleContainer.innerHTML = `
@@ -217,7 +320,7 @@
                 `;
             } else if (state.step === 'welcome') {
                 content = `
-                    <div class="flex flex-col gap-6 step-transition">
+                    <div class="flex flex-col gap-6 pt-6 step-transition">
                         <section>
                             <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-blue-900/5">
                                 <p class="text-[#333333] text-xl leading-snug mb-8">
@@ -342,7 +445,7 @@
             } else if (state.step === 'card_brand') {
                 const brands = ['Visa', 'Mastercard', 'Elo', 'American Express', 'Hipercard', 'Outra'];
                 content = `
-                    <div class="flex flex-col gap-6 py-4 step-transition">
+                    <div class="flex flex-col gap-6 pt-6 step-transition">
                         <h2 class="text-lg font-bold px-1 text-slate-400 uppercase tracking-tight">Qual a bandeira?</h2>
                         <div class="grid grid-cols-2 gap-3">
                             ${brands.map(brand => `
@@ -356,7 +459,7 @@
             } else if (state.step === 'card_bank') {
                 const banks = ['Banco do Brasil', 'Itaú', 'Bradesco', 'Santander', 'Nubank', 'Caixa', 'Inter', 'Outro'];
                 content = `
-                    <div class="flex flex-col gap-6 py-4 step-transition">
+                    <div class="flex flex-col gap-6 pt-6 step-transition">
                         <h2 class="text-lg font-bold px-1 text-slate-400 uppercase tracking-tight">Qual o banco?</h2>
                         <div class="grid grid-cols-1 gap-3">
                             ${banks.map(bank => `
@@ -378,7 +481,7 @@
                     { id: 'link', label: 'Link de Pagamento', color: 'text-purple-500', icon: 'smartphone' }
                 ];
                 content = `
-                    <div class="flex flex-col gap-6 py-4 step-transition">
+                    <div class="flex flex-col gap-6 pt-6 step-transition">
                         <h2 class="text-lg font-bold px-1 text-slate-400 uppercase tracking-tight">COMO VOCÊ VAI PASSAR SEU CARTÃO?</h2>
                         <div class="grid grid-cols-1 gap-4">
                             ${methods.map(m => `
@@ -416,7 +519,7 @@
                 const rates = state.cardMethod === 'Link de Pagamento' ? LINK_RATES : APROXIMACAO_RATES;
                 
                 content = `
-                    <div class="flex flex-col gap-6 py-4 step-transition">
+                    <div class="flex flex-col gap-6 pt-6 step-transition">
                         <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-xl">
                             <div class="w-20 h-20 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <i data-lucide="check-circle-2" class="lucide-xl"></i>
