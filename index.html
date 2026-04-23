@@ -251,6 +251,16 @@
         // --- Logic Helper ---
         const formatBRL = (val) => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }).replace('R$', 'R$ ');
 
+        const handleCredKeyInput = (val) => {
+            state.credKey = val;
+            const isKeyActive = state.credKey.toUpperCase() === DISCOUNT_KEY;
+            const banner = document.getElementById('credkey-success-banner');
+            if (banner) {
+                if (isKeyActive) banner.classList.remove('hidden');
+                else banner.classList.add('hidden');
+            }
+        };
+
         // --- View Injection ---
         const render = () => {
             const container = document.getElementById('app-container');
@@ -389,12 +399,10 @@
                                 <i data-lucide="ticket"></i>
                                 <span class="font-bold">Possui uma CredKey?</span>
                             </div>
-                            <input type="text" placeholder="DIGITE SUA CHAVE" value="${state.credKey}" oninput="state.credKey = this.value; render()" class="w-full border-2 border-slate-100 rounded-lg p-4 mb-4 text-center font-bold uppercase focus:border-[#3483FA] outline-none transition-colors">
-                            ${isKeyActive ? `
-                                <div class="mb-6 p-3 bg-green-50 text-green-700 rounded-md text-xs font-bold border border-green-100 flex items-center gap-2">
-                                    <i data-lucide="check-circle-2" class="lucide-xs"></i> Key Ativada! Desconto Aplicado
-                                </div>
-                            ` : ''}
+                            <input type="text" placeholder="DIGITE SUA CHAVE" value="${state.credKey}" oninput="handleCredKeyInput(this.value)" class="w-full border-2 border-slate-100 rounded-lg p-4 mb-4 text-center font-bold uppercase focus:border-[#3483FA] outline-none transition-colors">
+                            <div id="credkey-success-banner" class="mb-6 p-3 bg-green-50 text-green-700 rounded-md text-xs font-bold border border-green-100 flex items-center gap-2 ${isKeyActive ? '' : 'hidden'}">
+                                <i data-lucide="check-circle-2" class="lucide-xs"></i> Key Ativada! Desconto Aplicado
+                            </div>
                             <div class="flex flex-col gap-3">
                                 <button onclick="setState({step: 'results'})" class="w-full bg-[#3483FA] text-white py-4 rounded-md font-bold">Ver simulação</button>
                                 <button onclick="setState({credKey: '', step: 'results'})" class="w-full text-[#3483FA] font-bold text-sm py-2">Não tenho uma CredKey</button>
