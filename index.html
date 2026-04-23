@@ -118,6 +118,157 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
+        /* Help Popup Styles */
+        #help-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+            padding: 20px;
+        }
+
+        #help-popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #help-popup-card {
+            background: white;
+            width: 100%;
+            max-width: 280px;
+            border-radius: 24px;
+            padding: 32px 20px 24px;
+            position: relative;
+            transform: scale(0.8) translateY(20px);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        #help-popup-overlay.active #help-popup-card {
+            transform: scale(1) translateY(0);
+        }
+
+        #help-popup-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            background: #f1f5f9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+
+        #help-popup-close:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .help-icon-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+        }
+
+        .help-chat-bubble {
+            width: 60px;
+            height: 60px;
+            background: #3483FA;
+            border-radius: 16px 16px 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(52, 131, 250, 0.3);
+        }
+
+        .help-wa-icon {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 36px;
+            height: 36px;
+            background: white;
+            border-radius: 50%;
+            padding: 4px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .help-wa-icon div {
+            width: 100%;
+            height: 100%;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        #help-popup-card h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        #help-popup-card p {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .help-wa-button {
+            background: #25D366;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 10px 15px -3px rgba(37, 211, 102, 0.4);
+            margin-bottom: 16px;
+        }
+
+        .help-wa-button:active {
+            transform: scale(0.98);
+        }
+
+        .help-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -144,10 +295,87 @@
         <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">VTMCred © 2026</p>
     </footer>
 
+    <!-- Help Popup -->
+    <div id="help-popup-overlay">
+        <div id="help-popup-card">
+            <div id="help-popup-close">
+                <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            </div>
+            
+            <div class="help-icon-wrapper">
+                <div class="help-chat-bubble">
+                    <i data-lucide="message-square" style="width: 40px; height: 40px; color: white;"></i>
+                </div>
+                <div class="help-wa-icon">
+                    <div>
+                        <i data-lucide="phone" style="width: 20px; height: 20px; color: white;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Precisa de<br>ajuda?</h2>
+            <p>Fale comigo no WhatsApp e receba atendimento rápido.</p>
+
+            <a id="help-wa-link" href="#" target="_blank" class="help-wa-button">
+                <i data-lucide="message-circle" style="width: 20px; height: 20px;"></i>
+                FALAR NO WHATSAPP
+            </a>
+
+            <div class="help-footer">
+                <i data-lucide="lock" style="width: 12px; height: 12px;"></i>
+                Atendimento seguro e sigiloso.
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- Configuration & Constants ---
         const DISCOUNT_KEY = "VTMCLIENTE4";
         const PHONE_NUMBER = "5593996589790";
+
+        // --- Help Popup Logic ---
+        let helpPopupTimer;
+        const helpPopupDelay = 20000; // 20 seconds
+
+        const initHelpPopup = () => {
+            const overlay = document.getElementById('help-popup-overlay');
+            const closeBtn = document.getElementById('help-popup-close');
+            const waLink = document.getElementById('help-wa-link');
+            const isDismissed = localStorage.getItem('helpPopupDismissed');
+
+            if (isDismissed) return;
+
+            const waMsg = encodeURIComponent("Olá! Vim pelo site da VTMCred e gostaria de mais informações.");
+            waLink.href = `https://wa.me/${PHONE_NUMBER}?text=${waMsg}`;
+
+            const showPopup = () => {
+                overlay.classList.add('active');
+            };
+
+            const resetTimer = () => {
+                if (overlay.classList.contains('active')) return;
+                clearTimeout(helpPopupTimer);
+                helpPopupTimer = setTimeout(showPopup, helpPopupDelay);
+            };
+
+            // Events to reset timer - reset only on user interaction (clicks/touches)
+            ['mousedown', 'touchstart'].forEach(name => {
+                document.addEventListener(name, resetTimer, true);
+            });
+
+            closeBtn.onclick = () => {
+                overlay.classList.remove('active');
+                localStorage.setItem('helpPopupDismissed', 'true');
+            };
+
+            waLink.onclick = () => {
+                overlay.classList.remove('active');
+                localStorage.setItem('helpPopupDismissed', 'true');
+            };
+
+            // Start initial timer
+            helpPopupTimer = setTimeout(showPopup, helpPopupDelay);
+        };
 
         const SLOGAN_PHRASES = [
             "Compromisso claro, Crédito direto.",
@@ -483,7 +711,7 @@
                             </div>
                             <input type="text" placeholder="DIGITE SUA CHAVE" value="${state.credKey}" oninput="handleCredKeyInput(this.value)" class="w-full border-2 border-slate-100 rounded-lg p-4 mb-4 text-center font-bold uppercase focus:border-[#3483FA] outline-none transition-colors">
                             <div id="credkey-success-banner" class="mb-6 p-3 bg-green-50 text-green-700 rounded-md text-xs font-bold border border-green-100 flex items-center gap-2 ${isKeyActive ? '' : 'hidden'}">
-                                <i data-lucide="check-circle-2" class="lucide-xs"></i> Desconto aplicado! Sua taxa foi reduzida em 4%.
+                                <i data-lucide="check-circle-2" class="lucide-xs"></i> CredKey aplicada! Taxa reduzida em 4%.
                             </div>
                             <div class="flex flex-col gap-3">
                                 <button onclick="setState({step: 'results'})" class="w-full bg-[#3483FA] text-white py-4 rounded-md font-bold">Ver simulação</button>
@@ -717,6 +945,7 @@
         };
 
         // --- Initial Render ---
+        initHelpPopup();
         render();
     </script>
 </body>
