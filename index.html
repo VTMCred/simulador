@@ -243,8 +243,9 @@
         };
 
         const setState = (updates) => {
+            const stepChanged = updates.step && updates.step !== state.step;
             state = { ...state, ...updates };
-            window.scrollTo(0, 0); // Always reset scroll to top on step change
+            if (stepChanged) window.scrollTo(0, 0); 
             render();
         };
 
@@ -317,7 +318,9 @@
 
             // Optimization: Don't re-render the whole app-container if the step hasn't changed
             // This prevents losing focus on inputs while typing if something else calls render()
-            if (currentRenderedStep === state.step) {
+            // We ONLY skip re-render for steps that have active inputs
+            const typingSteps = ['amount', 'key', 'card_amount'];
+            if (currentRenderedStep === state.step && typingSteps.includes(state.step)) {
                 // Update specific bits for the current step to keep it interactive without redraw
                 if(state.step === 'amount') {
                     const btn = document.getElementById('loan-btn-continue');
@@ -657,21 +660,24 @@
             const total = Math.round(state.amount * (1 + currentRate * months));
             const inst = Math.round(total / months);
             
-            const msg = `Fiz a minha simulação e escolhi pagar com *${months} parcelas de ${formatBRL(inst)}*.\n\n*[VTMCred Simulador]*`;
+            const msg = `Fiz uma simulação no *VTMCred*.\n\nResumo da simulação:\n\n* Valor: *${formatBRL(state.amount)}*\n* Parcelamento: *${months}* parcelas de *${formatBRL(inst)}*\n* Total: *${formatBRL(total)}*\n\nGostaria de seguir com a contratação.`;
             window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
         const handleSendCardWA = () => {
             let msg = '';
+            const valUsed = state.cardAmount > 0 ? formatBRL(state.cardAmount) : 'Não informado';
+            
             if (state.cardInstallment) {
                 const m = state.cardInstallment;
                 const rates = state.cardMethod === 'Link de Pagamento' ? LINK_RATES : APROXIMACAO_RATES;
                 const rate = rates[m];
                 const total = state.cardAmount * (1 + rate);
                 const instValue = total / m;
-                msg = `Olá! Fiz uma simulação de CARTÃO (${state.cardMethod.toUpperCase()}) no VTMCred:\n\n*Limite:* ${formatBRL(state.cardAmount)}\n*Bandeira:* ${state.cardBrand}\n*Banco:* ${state.cardBank}\n*Parcelado em:* ${m}x de ${formatBRL(instValue)}\n*Total:* ${formatBRL(total)}\n\n*[VTMCred Simulador Cartão]*`;
+                
+                msg = `Fiz uma simulação para Cartão no *VTMCred*.\n\nResumo da simulação:\n\n* Valor utilizado: *${valUsed}*\n* Método: *${state.cardMethod}*\n* Bandeira: *${state.cardBrand}*\n* Banco: *${state.cardBank}*\n\nParcelamento:\n\n* ${m}x de *${formatBRL(instValue)}*\n* Total: *${formatBRL(total)}*\n\nGostaria de seguir com a contratação.`;
             } else {
-                msg = `Olá! Fiz uma simulação de CARTÃO no VTMCred:\n\n*Bandeira:* ${state.cardBrand}\n*Banco:* ${state.cardBank}\n*Método:* ${state.cardMethod}\n\n*[VTMCred Simulador Cartão]*`;
+                msg = `Fiz uma simulação para Cartão no *VTMCred*.\n\nResumo da simulação:\n\n* Valor utilizado: *${valUsed}*\n* Método: *${state.cardMethod}*\n* Bandeira: *${state.cardBrand}*\n* Banco: *${state.cardBank}*\n\nGostaria de seguir com a contratação.`;
             }
             window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         };
