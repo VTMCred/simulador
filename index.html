@@ -709,13 +709,13 @@
                                 <i data-lucide="ticket"></i>
                                 <span class="font-black text-slate-800 text-lg">Possui uma CredKey?</span>
                             </div>
-                            <input type="text" placeholder="DIGITE SUA CHAVE" value="${state.credKey}" oninput="handleCredKeyInput(this.value)" class="w-full border-2 border-slate-100 rounded-xl p-4 mb-6 text-center font-black uppercase focus:border-fintech-royal outline-none transition-colors text-xl tracking-widest">
+                            <input type="text" placeholder="Digite sua chave" value="${state.credKey}" oninput="handleCredKeyInput(this.value)" class="w-full border-2 border-slate-100 rounded-xl p-4 mb-6 text-center font-bold focus:border-fintech-royal outline-none transition-colors text-lg placeholder:text-slate-300 placeholder:font-medium placeholder:normal-case placeholder:text-sm">
                             <div id="credkey-success-banner" class="mb-8 p-4 bg-green-50 text-green-700 rounded-xl text-xs font-black border border-green-100 flex items-center gap-2 ${isKeyActive ? '' : 'hidden'}">
                                 <i data-lucide="check-circle-2" class="lucide-xs"></i> CredKey aplicada! Taxa reduzida em 4%.
                             </div>
                             <div class="flex flex-col gap-3">
                                 <button onclick="setState({step: 'results'})" class="w-full bg-fintech-royal text-white py-5 rounded-xl font-black uppercase tracking-wider shadow-lg shadow-blue-200">Ver simulação</button>
-                                <button onclick="setState({credKey: '', step: 'results'})" class="w-full text-fintech-royal font-black text-xs py-2 uppercase tracking-tight">Não tenho uma CredKey</button>
+                                <button onclick="setState({credKey: '', step: 'results'})" class="w-full text-fintech-royal font-black text-xs py-2 tracking-tight">Não tenho uma CredKey</button>
                             </div>
                         </div>
                     </div>
