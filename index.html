@@ -58,6 +58,7 @@
         .bg-fintech-royal { background-color: #002BFF; }
         .text-fintech-royal { color: #002BFF; }
         .border-fintech-royal { border-color: #002BFF; }
+        .bg-fintech-btn { background-color: #2E5BFF; }
         .custom-scrollbar::-webkit-scrollbar {
             width: 4px;
         }
@@ -85,13 +86,13 @@
             }
         }
         .animate-fade-up {
-            animation: fadeInUp 0.5s ease-out forwards;
+            animation: fadeInUp 0.8s ease-out forwards;
             opacity: 0;
         }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
-        .delay-400 { animation-delay: 400ms; }
+        .delay-100 { animation-delay: 200ms; }
+        .delay-200 { animation-delay: 400ms; }
+        .delay-300 { animation-delay: 600ms; }
+        .delay-400 { animation-delay: 800ms; }
         [data-lucide] {
             width: 24px;
             height: 24px;
@@ -651,10 +652,10 @@
                     <div class="flex flex-col gap-6 pt-6 step-transition">
                         <section>
                             <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-blue-900/5">
-                                <p class="text-slate-800 text-xl leading-snug mb-8">
+                                <p class="text-slate-800 text-lg leading-snug mb-6">
                                     Simulação <span class="font-black text-fintech-royal">transparente</span> em segundos, com condições claras.
                                 </p>
-                                <button onclick="setState({step: 'amount'})" class="w-full bg-fintech-royal text-white py-5 rounded-xl font-black text-lg hover:shadow-lg hover:shadow-blue-200 transition-all uppercase tracking-widest">
+                                <button onclick="setState({step: 'amount'})" class="w-full bg-fintech-btn text-white py-4 rounded-xl font-black text-base hover:shadow-lg hover:shadow-blue-200 transition-all uppercase tracking-widest">
                                     SIMULAR AGORA
                                 </button>
                             </div>
@@ -687,14 +688,13 @@
             } else if (state.step === 'amount') {
                 content = `
                     <div class="flex-1 flex flex-col gap-6 step-transition">
-                        <h2 class="text-lg font-black px-1 text-slate-400 uppercase tracking-tighter">Início</h2>
                         <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-blue-900/5">
                             <p class="text-slate-600 text-lg mb-8 font-medium">Que valor foi disponibilizado pra você?</p>
                             <div class="relative border-b-2 border-fintech-royal py-2 mb-10 group">
                                 <span class="text-2xl font-black mr-2 text-fintech-royal">R$</span>
                                 <input id="loan-amount-input" type="number" placeholder="0,00" value="${state.amount || ''}" oninput="state.amount = Number(this.value); document.getElementById('loan-btn-continue').disabled = !state.amount || state.amount <= 0" class="w-full bg-transparent text-4xl font-black focus:outline-none placeholder:text-slate-100">
                             </div>
-                            <button id="loan-btn-continue" onclick="if(state.amount > 0) setState({step: 'key'})" ${(!state.amount || state.amount <= 0) ? 'disabled' : ''} class="w-full bg-fintech-royal text-white py-5 rounded-xl font-black transition-all disabled:opacity-30 flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
+                            <button id="loan-btn-continue" onclick="if(state.amount > 0) setState({step: 'key'})" ${(!state.amount || state.amount <= 0) ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all disabled:opacity-30 flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
                                 Continuar <i data-lucide="chevron-right" class="lucide-xs"></i>
                             </button>
                         </div>
@@ -714,14 +714,39 @@
                                 <i data-lucide="check-circle-2" class="lucide-xs"></i> CredKey aplicada! Taxa reduzida em 4%.
                             </div>
                             <div class="flex flex-col gap-3">
-                                <button onclick="setState({step: 'results'})" class="w-full bg-fintech-royal text-white py-5 rounded-xl font-black uppercase tracking-wider shadow-lg shadow-blue-200">Ver simulação</button>
+                                <button onclick="setState({step: 'results'})" class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black uppercase tracking-wider shadow-lg shadow-blue-200">Ver simulação</button>
                                 <button onclick="setState({credKey: '', step: 'results'})" class="w-full text-fintech-royal font-black text-xs py-2 tracking-tight">Não tenho uma CredKey</button>
                             </div>
                         </div>
                     </div>
                 `;
             } else if (state.step === 'results') {
-                const baseRate = state.amount <= 500 ? 0.30 : (state.amount < 1000 ? 0.20 : 0.15);
+                const getProgressiveRate = (val) => {
+                    if (!val || val <= 0) return 0.30;
+                    let total = 0;
+                    let remaining = val;
+                    
+                    // Até 500: 30%
+                    const b1 = Math.min(remaining, 500);
+                    total += b1 * 0.30;
+                    remaining -= b1;
+                    
+                    // 500 a 1000: 20%
+                    if (remaining > 0) {
+                        const b2 = Math.min(remaining, 500);
+                        total += b2 * 0.20;
+                        remaining -= b2;
+                    }
+                    
+                    // Acima de 1000: 15%
+                    if (remaining > 0) {
+                        total += remaining * 0.15;
+                    }
+                    
+                    return total / val;
+                };
+
+                const baseRate = getProgressiveRate(state.amount);
                 const currentRate = state.credKey.toUpperCase() === DISCOUNT_KEY ? baseRate - 0.04 : baseRate;
                 const maxInst = state.amount < 1000 ? 5 : 12;
                 
@@ -739,7 +764,7 @@
                                 <h2 class="text-xl font-black text-slate-800">Simulação</h2>
                                 <div class="text-fintech-royal flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-lg">
                                     <i data-lucide="info" class="lucide-xs"></i>
-                                    <span class="text-[10px] font-black font-mono">${(currentRate * 100).toFixed(0)}% a.m.</span>
+                                    <span class="text-[10px] font-black font-mono">${(currentRate * 100).toFixed(1)}% a.m.</span>
                                 </div>
                             </header>
                             
@@ -844,7 +869,7 @@
                                 <span class="text-2xl font-bold mr-2 text-fintech-royal">R$</span>
                                 <input id="card-amount-input" type="number" placeholder="0,00" value="${state.cardAmount || ''}" oninput="state.cardAmount = Number(this.value); document.getElementById('card-btn-continue').disabled = !state.cardAmount || state.cardAmount <= 0" class="w-full bg-transparent text-4xl font-black focus:outline-none placeholder:text-slate-100">
                             </div>
-                            <button id="card-btn-continue" onclick="if(state.cardAmount > 0) setState({step: 'card_results'})" ${(!state.cardAmount || state.cardAmount <= 0) ? 'disabled' : ''} class="w-full bg-fintech-royal text-white py-5 rounded-xl font-bold transition-all disabled:opacity-30 flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
+                            <button id="card-btn-continue" onclick="if(state.cardAmount > 0) setState({step: 'card_results'})" ${(!state.cardAmount || state.cardAmount <= 0) ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-bold transition-all disabled:opacity-30 flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
                                 Continuar <i data-lucide="chevron-right" class="lucide-xs"></i>
                             </button>
                         </div>
