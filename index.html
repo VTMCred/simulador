@@ -721,7 +721,7 @@
                     </div>
                 `;
             } else if (state.step === 'results') {
-                const baseRate = state.amount < 1000 ? 0.20 : 0.15;
+                const baseRate = state.amount <= 500 ? 0.30 : (state.amount < 1000 ? 0.20 : 0.15);
                 const currentRate = state.credKey.toUpperCase() === DISCOUNT_KEY ? baseRate - 0.04 : baseRate;
                 const maxInst = state.amount < 1000 ? 5 : 12;
                 
