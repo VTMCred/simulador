@@ -192,7 +192,7 @@
         .help-chat-bubble {
             width: 60px;
             height: 60px;
-            background: #3483FA;
+            background: #002BFF;
             border-radius: 16px 16px 0 16px;
             display: flex;
             align-items: center;
@@ -548,7 +548,7 @@
                 btnBack.classList.add('hidden');
                 spacerLeft.classList.remove('hidden');
                 if (!document.getElementById('animated-slogan')) {
-                    subtitleContainer.innerHTML = `<span id="animated-slogan" class="text-white/80 text-[10px] uppercase tracking-[0.15em] font-medium text-center min-h-[1em]"></span>`;
+                    subtitleContainer.innerHTML = `<span id="animated-slogan" class="text-white/80 text-[12px] whitespace-nowrap uppercase tracking-[0.15em] font-medium text-center min-h-[1em]"></span>`;
                     startSloganAnimation();
                 }
             } else {
@@ -563,7 +563,7 @@
                             <div class="w-4 h-4 rounded-full border-2 border-white flex items-center justify-center">
                                 <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
                             </div>
-                            <span class="text-white/90 text-xs uppercase tracking-widest leading-none">${headerSubtitle}</span>
+                            <span class="text-white/90 text-[14px] whitespace-nowrap uppercase tracking-widest leading-none">${headerSubtitle}</span>
                         </div>
                     `;
                 }
@@ -608,23 +608,23 @@
                             </p>
                         </div>
                         <div class="grid grid-cols-1 gap-4">
-                            <button onclick="setState({step: 'welcome'})" class="animate-fade-up delay-100 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 text-left transition-all active:scale-95 group hover:border-[#3483FA]">
-                                <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-[#3483FA] shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <button onclick="setState({step: 'welcome'})" class="animate-fade-up delay-100 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 text-left transition-all active:scale-95 group hover:border-fintech-royal">
+                                <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-fintech-royal shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                                     <i data-lucide="trending-down" class="lucide-large"></i>
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="font-bold text-lg text-slate-800">Simulador Crédito</h3>
-                                    <p class="text-sm text-slate-500">Taxas claras e análise rápida com responsabilidade.</p>
+                                    <h3 class="font-black text-lg text-slate-800">Simulador Crédito</h3>
+                                    <p class="text-sm text-slate-500 font-medium">Taxas claras e análise rápida com responsabilidade.</p>
                                 </div>
                                 <i data-lucide="chevron-right" class="text-slate-300 lucide-small"></i>
                             </button>
-                            <button onclick="setState({step: 'card_brand'})" class="animate-fade-up delay-200 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 text-left transition-all active:scale-95 group hover:border-[#3483FA]">
+                            <button onclick="setState({step: 'card_brand'})" class="animate-fade-up delay-200 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 text-left transition-all active:scale-95 group hover:border-fintech-royal">
                                 <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 shrink-0 group-hover:bg-purple-600 group-hover:text-white transition-colors">
                                     <i data-lucide="credit-card" class="lucide-large"></i>
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="font-bold text-lg text-slate-800">Simulador Cartão</h3>
-                                    <p class="text-sm text-slate-500">Converta seu limite em PIX com condições claras.</p>
+                                    <h3 class="font-black text-lg text-slate-800">Simulador Cartão</h3>
+                                    <p class="text-sm text-slate-500 font-medium">Converta seu limite em PIX com condições claras.</p>
                                 </div>
                                 <i data-lucide="chevron-right" class="text-slate-300 lucide-small"></i>
                             </button>
@@ -633,14 +633,14 @@
                                     <i data-lucide="layout-grid" class="lucide-large"></i>
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="font-bold text-lg text-slate-400">Em breve...</h3>
-                                    <p class="text-sm text-slate-400">Novas facilidades para o seu dia a dia.</p>
+                                    <h3 class="font-black text-lg text-slate-400">Em breve...</h3>
+                                    <p class="text-sm text-slate-400 font-medium">Novas facilidades para o seu dia a dia.</p>
                                 </div>
                                 <i data-lucide="lock" class="text-slate-300 lucide-small"></i>
                             </div>
                         </div>
                         <div class="animate-fade-up delay-400 text-center mt-4">
-                            <a href="https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent('Olá! Vim pelo site da VTMCred e gostaria de mais informações.')}" target="_blank" class="text-slate-400 hover:text-[#3483FA] text-xs font-medium transition-colors inline-block active:scale-95">
+                            <a href="https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent('Olá! Vim pelo site da VTMCred e gostaria de mais informações.')}" target="_blank" class="text-slate-400 hover:text-[#25D366] text-xs font-medium transition-colors inline-block active:scale-95">
                                 Precisa de ajuda? <span class="underline">Fale comigo no WhatsApp</span>
                             </a>
                         </div>
@@ -651,10 +651,10 @@
                     <div class="flex flex-col gap-6 pt-6 step-transition">
                         <section>
                             <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-blue-900/5">
-                                <p class="text-[#333333] text-xl leading-snug mb-8">
-                                    Simulação <span class="font-bold text-fintech-royal">transparente</span> em segundos, com condições claras.
+                                <p class="text-slate-800 text-xl leading-snug mb-8">
+                                    Simulação <span class="font-black text-fintech-royal">transparente</span> em segundos, com condições claras.
                                 </p>
-                                <button onclick="setState({step: 'amount'})" class="w-full bg-[#3483FA] text-white py-5 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-blue-200 transition-all uppercase tracking-widest">
+                                <button onclick="setState({step: 'amount'})" class="w-full bg-fintech-royal text-white py-5 rounded-xl font-black text-lg hover:shadow-lg hover:shadow-blue-200 transition-all uppercase tracking-widest">
                                     SIMULAR AGORA
                                 </button>
                             </div>
@@ -667,8 +667,8 @@
                                         <i data-lucide="trending-down"></i>
                                     </div>
                                     <div>
-                                        <p class="font-bold text-slate-800">Condições Transparentes</p>
-                                        <p class="text-sm text-slate-500">Condições a partir de <span class="font-bold">15%</span> ao mês.</p>
+                                        <p class="font-black text-slate-800">Condições Transparentes</p>
+                                        <p class="text-sm text-slate-500 font-medium">Condições a partir de <span class="font-black text-fintech-royal">15%</span> ao mês.</p>
                                     </div>
                                 </div>
                                 <div class="bg-white p-5 rounded-xl border border-slate-100 flex items-center gap-4">
@@ -676,8 +676,8 @@
                                         <i data-lucide="check-circle-2"></i>
                                     </div>
                                     <div>
-                                        <p class="font-bold text-slate-800">Atendimento Rápido e Digital</p>
-                                        <p class="text-sm text-slate-500">Atendimento rápido e direto via WhatsApp.</p>
+                                        <p class="font-black text-slate-800">Atendimento Digital</p>
+                                        <p class="text-sm text-slate-500 font-medium font-medium">Rápido e direto via WhatsApp.</p>
                                     </div>
                                 </div>
                             </div>
@@ -687,14 +687,14 @@
             } else if (state.step === 'amount') {
                 content = `
                     <div class="flex-1 flex flex-col gap-6 step-transition">
-                        <h2 class="text-lg font-bold px-1 text-slate-400 uppercase tracking-tighter">Início</h2>
+                        <h2 class="text-lg font-black px-1 text-slate-400 uppercase tracking-tighter">Início</h2>
                         <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-blue-900/5">
-                            <p class="text-slate-600 text-lg mb-8 leading-relaxed">Que valor foi disponibilizado pra você?</p>
+                            <p class="text-slate-600 text-lg mb-8 font-medium">Que valor foi disponibilizado pra você?</p>
                             <div class="relative border-b-2 border-fintech-royal py-2 mb-10 group">
-                                <span class="text-2xl font-bold mr-2 text-fintech-royal">R$</span>
+                                <span class="text-2xl font-black mr-2 text-fintech-royal">R$</span>
                                 <input id="loan-amount-input" type="number" placeholder="0,00" value="${state.amount || ''}" oninput="state.amount = Number(this.value); document.getElementById('loan-btn-continue').disabled = !state.amount || state.amount <= 0" class="w-full bg-transparent text-4xl font-black focus:outline-none placeholder:text-slate-100">
                             </div>
-                            <button id="loan-btn-continue" onclick="if(state.amount > 0) setState({step: 'key'})" ${(!state.amount || state.amount <= 0) ? 'disabled' : ''} class="w-full bg-fintech-royal text-white py-5 rounded-xl font-bold transition-all disabled:opacity-30 flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
+                            <button id="loan-btn-continue" onclick="if(state.amount > 0) setState({step: 'key'})" ${(!state.amount || state.amount <= 0) ? 'disabled' : ''} class="w-full bg-fintech-royal text-white py-5 rounded-xl font-black transition-all disabled:opacity-30 flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
                                 Continuar <i data-lucide="chevron-right" class="lucide-xs"></i>
                             </button>
                         </div>
@@ -704,18 +704,18 @@
                 const isKeyActive = state.credKey.toUpperCase() === DISCOUNT_KEY;
                 content = `
                     <div class="flex-1 flex flex-col gap-6 step-transition">
-                        <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm mt-4">
-                            <div class="flex items-center gap-3 mb-4 text-[#3483FA]">
+                        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-xl mt-4">
+                            <div class="flex items-center gap-3 mb-6 text-fintech-royal">
                                 <i data-lucide="ticket"></i>
-                                <span class="font-bold">Possui uma CredKey?</span>
+                                <span class="font-black text-slate-800 text-lg">Possui uma CredKey?</span>
                             </div>
-                            <input type="text" placeholder="DIGITE SUA CHAVE" value="${state.credKey}" oninput="handleCredKeyInput(this.value)" class="w-full border-2 border-slate-100 rounded-lg p-4 mb-4 text-center font-bold uppercase focus:border-[#3483FA] outline-none transition-colors">
-                            <div id="credkey-success-banner" class="mb-6 p-3 bg-green-50 text-green-700 rounded-md text-xs font-bold border border-green-100 flex items-center gap-2 ${isKeyActive ? '' : 'hidden'}">
+                            <input type="text" placeholder="DIGITE SUA CHAVE" value="${state.credKey}" oninput="handleCredKeyInput(this.value)" class="w-full border-2 border-slate-100 rounded-xl p-4 mb-6 text-center font-black uppercase focus:border-fintech-royal outline-none transition-colors text-xl tracking-widest">
+                            <div id="credkey-success-banner" class="mb-8 p-4 bg-green-50 text-green-700 rounded-xl text-xs font-black border border-green-100 flex items-center gap-2 ${isKeyActive ? '' : 'hidden'}">
                                 <i data-lucide="check-circle-2" class="lucide-xs"></i> CredKey aplicada! Taxa reduzida em 4%.
                             </div>
                             <div class="flex flex-col gap-3">
-                                <button onclick="setState({step: 'results'})" class="w-full bg-[#3483FA] text-white py-4 rounded-md font-bold">Ver simulação</button>
-                                <button onclick="setState({credKey: '', step: 'results'})" class="w-full text-[#3483FA] font-bold text-sm py-2">Não tenho uma CredKey</button>
+                                <button onclick="setState({step: 'results'})" class="w-full bg-fintech-royal text-white py-5 rounded-xl font-black uppercase tracking-wider shadow-lg shadow-blue-200">Ver simulação</button>
+                                <button onclick="setState({credKey: '', step: 'results'})" class="w-full text-fintech-royal font-black text-xs py-2 uppercase tracking-tight">Não tenho uma CredKey</button>
                             </div>
                         </div>
                     </div>
@@ -733,39 +733,45 @@
                 });
 
                 content = `
-                    <div class="flex-1 flex flex-col gap-4 step-transition">
-                        <header class="px-1 flex justify-between items-center mb-2">
-                            <h2 class="text-xl font-bold">Simulação</h2>
-                            <div class="text-[#3483FA] flex items-center gap-1">
-                                <i data-lucide="info" class="lucide-small"></i>
-                                <span class="text-xs font-bold font-mono">${(currentRate * 100).toFixed(0)}% a.m.</span>
-                            </div>
-                        </header>
-                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm mb-2">
-                            <div class="flex justify-between items-center">
-                                <span class="text-slate-400 text-sm font-bold uppercase">VALOR TOTAL</span>
-                                <span class="text-lg font-bold">${formatBRL(state.amount)}</span>
-                            </div>
-                        </div>
-                        <p class="text-[13px] text-slate-500 font-medium px-1 mb-4 leading-relaxed">Selecione o parcelamento que deseja e clique em Enviar pelo WhatsApp.</p>
-                        <div class="flex flex-col gap-2 overflow-y-auto max-h-[420px] pr-1 custom-scrollbar">
-                            ${simList.map(sim => `
-                                <div onclick="setState({selectedInstallment: ${sim.months}}); setTimeout(() => document.getElementById('wa-btn-loan')?.scrollIntoView({behavior: 'smooth', block: 'center'}), 100)" class="bg-white p-4 rounded-lg border transition-all active:scale-[0.98] cursor-pointer ${state.selectedInstallment === sim.months ? 'border-[#3483FA] ring-1 ring-[#3483FA]' : 'border-slate-200'}">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <span class="text-md font-bold">${sim.months}x Parcelas</span>
-                                        <span class="text-xs text-slate-400">${formatBRL(sim.total)}</span>
-                                    </div>
-                                    <div class="text-2xl font-bold text-[#333333]">${formatBRL(sim.inst)}</div>
+                    <div class="flex-1 flex flex-col gap-4 step-transition pt-4">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xl">
+                            <header class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-black text-slate-800">Simulação</h2>
+                                <div class="text-fintech-royal flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-lg">
+                                    <i data-lucide="info" class="lucide-xs"></i>
+                                    <span class="text-[10px] font-black font-mono">${(currentRate * 100).toFixed(0)}% a.m.</span>
                                 </div>
-                            `).join('')}
-                        </div>
-                        ${state.selectedInstallment ? `
-                            <div class="mt-auto pt-6 border-t border-slate-200">
-                                <button id="wa-btn-loan" onclick="handleSendWA()" class="w-full bg-[#25D366] text-white py-5 rounded-md flex items-center justify-center gap-3 text-lg font-bold shadow-lg active:scale-95 transition-all">
-                                    <i data-lucide="message-circle" class="lucide-large"></i> Enviar pelo WhatsApp
-                                </button>
+                            </header>
+                            
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-400 text-xs font-black uppercase tracking-widest">VALOR TOTAL</span>
+                                    <span class="text-lg font-black text-fintech-royal">${formatBRL(state.amount)}</span>
+                                </div>
                             </div>
-                        ` : ''}
+                            
+                            <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Escolha o parcelamento:</p>
+                            
+                            <div class="flex flex-col gap-2 overflow-y-auto max-h-[380px] pr-1 custom-scrollbar">
+                                ${simList.map(sim => `
+                                    <div onclick="setState({selectedInstallment: ${sim.months}}); setTimeout(() => document.getElementById('wa-btn-loan')?.scrollIntoView({behavior: 'smooth', block: 'center'}), 100)" class="p-4 rounded-xl border-2 transition-all active:scale-[0.98] cursor-pointer text-left ${state.selectedInstallment === sim.months ? 'border-fintech-royal bg-blue-50 shadow-sm' : 'border-slate-100 bg-white hover:border-slate-200'}">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-md font-extrabold text-slate-700">${sim.months}x Parcelas</span>
+                                            <span class="text-[10px] font-bold text-slate-400">${formatBRL(sim.total)}</span>
+                                        </div>
+                                        <div class="text-2xl font-black text-slate-800">${formatBRL(sim.inst)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            ${state.selectedInstallment ? `
+                                <div class="mt-6 pt-6 border-t border-slate-100">
+                                    <button id="wa-btn-loan" onclick="handleSendWA()" class="w-full bg-[#25D366] text-white py-5 rounded-xl flex items-center justify-center gap-3 text-lg font-bold shadow-lg active:scale-95 transition-all">
+                                        <i data-lucide="message-circle" class="lucide-large"></i> Enviar pelo WhatsApp
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
                     </div>
                 `;
             } else if (state.step === 'card_brand') {
@@ -775,7 +781,7 @@
                         <h2 class="text-lg font-bold px-1 text-slate-400 uppercase tracking-tight">Qual a bandeira?</h2>
                         <div class="grid grid-cols-1 gap-3">
                             ${brands.map(brand => `
-                                <button onclick="setState({cardBrand: '${brand}', step: 'card_bank'})" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between font-bold text-slate-700 hover:border-[#3483FA] active:scale-95 transition-all">
+                                <button onclick="setState({cardBrand: '${brand}', step: 'card_bank'})" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between font-black text-slate-800 hover:border-fintech-royal active:scale-95 transition-all">
                                     <div class="flex items-center gap-3">
                                         <i data-lucide="credit-card" class="text-slate-400 lucide-small"></i>
                                         ${brand}
@@ -793,7 +799,7 @@
                         <h2 class="text-lg font-bold px-1 text-slate-400 uppercase tracking-tight">Qual o banco?</h2>
                         <div class="grid grid-cols-1 gap-3">
                             ${banks.map(bank => `
-                                <button onclick="setState({cardBank: '${bank}', step: 'card_method'})" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between font-bold text-slate-700 hover:border-[#3483FA] active:scale-95 transition-all">
+                                <button onclick="setState({cardBank: '${bank}', step: 'card_method'})" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between font-black text-slate-800 hover:border-fintech-royal active:scale-95 transition-all">
                                     <div class="flex items-center gap-3">
                                         <i data-lucide="building-2" class="text-slate-400 lucide-small"></i>
                                         ${bank}
@@ -815,12 +821,12 @@
                         <h2 class="text-lg font-bold px-1 text-slate-400 uppercase tracking-tight">COMO VOCÊ VAI PASSAR SEU CARTÃO?</h2>
                         <div class="grid grid-cols-1 gap-4">
                             ${methods.map(m => `
-                                <button onclick="setState({cardMethod: '${m.label}', step: 'card_amount'})" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 text-left transition-all active:scale-95 group hover:border-[#3483FA]">
+                                <button onclick="setState({cardMethod: '${m.label}', step: 'card_amount'})" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 text-left transition-all active:scale-95 group hover:border-fintech-royal">
                                     <div class="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-blue-50 transition-colors">
                                         <i data-lucide="${m.icon}" class="${m.color}"></i>
                                     </div>
                                     <div class="flex-1">
-                                        <h3 class="font-bold text-lg text-slate-800">${m.label}</h3>
+                                        <h3 class="font-black text-lg text-slate-800">${m.label}</h3>
                                     </div>
                                     <i data-lucide="chevron-right" class="text-slate-300"></i>
                                 </button>
@@ -854,40 +860,40 @@
                             <div class="w-20 h-20 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <i data-lucide="check-circle-2" class="lucide-xl"></i>
                             </div>
-                            <h2 class="text-2xl font-bold text-slate-800 mb-2 text-center">Simulação Pronta!</h2>
+                            <h2 class="text-2xl font-black text-slate-800 mb-2 text-center">Simulação Pronta!</h2>
                             <div class="space-y-3 mb-8 text-left bg-slate-50 p-4 rounded-xl border border-slate-100">
                                 <div class="flex justify-between text-sm">
-                                    <span class="text-slate-400 font-bold uppercase">Bandeira:</span>
-                                    <span class="font-bold text-slate-700">${state.cardBrand}</span>
+                                    <span class="text-slate-400 font-black uppercase text-[10px] tracking-widest">Bandeira:</span>
+                                    <span class="font-black text-slate-700">${state.cardBrand}</span>
                                 </div>
                                 <div class="flex justify-between text-sm">
-                                    <span class="text-slate-400 font-bold uppercase">Banco:</span>
-                                    <span class="font-bold text-slate-700">${state.cardBank}</span>
+                                    <span class="text-slate-400 font-black uppercase text-[10px] tracking-widest">Banco:</span>
+                                    <span class="font-black text-slate-700">${state.cardBank}</span>
                                 </div>
                                 <div class="flex justify-between text-sm">
-                                    <span class="text-slate-400 font-bold uppercase">Método:</span>
-                                    <span class="font-bold text-slate-700">${state.cardMethod}</span>
+                                    <span class="text-slate-400 font-black uppercase text-[10px] tracking-widest">Método:</span>
+                                    <span class="font-black text-slate-700">${state.cardMethod}</span>
                                 </div>
                                 ${state.cardAmount > 0 ? `
                                     <div class="flex justify-between text-sm border-t border-slate-200 pt-2 mt-2">
-                                        <span class="text-slate-400 font-bold uppercase">Limite Utilizado:</span>
-                                        <span class="font-bold text-fintech-royal">${formatBRL(state.cardAmount)}</span>
+                                        <span class="text-slate-400 font-black uppercase text-[10px] tracking-widest">Limite Utilizado:</span>
+                                        <span class="font-black text-fintech-royal">${formatBRL(state.cardAmount)}</span>
                                     </div>
                                 ` : ''}
                             </div>
                             
                             ${(isSpecial && state.cardAmount > 0) ? `
                                 <div class="space-y-4">
-                                    <p class="text-sm text-slate-500 font-bold uppercase tracking-widest text-left px-1">Selecione o parcelamento:</p>
-                                    <div class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1">
+                                    <p class="text-[11px] text-slate-400 font-black uppercase tracking-widest text-left px-1">Selecione o parcelamento:</p>
+                                    <div class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
                                         ${Object.entries(rates).map(([months, rate]) => {
                                             const m = Number(months);
                                             const total = state.cardAmount * (1 + rate);
                                             const instValue = total / m;
                                             return `
-                                                <div onclick="setState({cardInstallment: ${m}}); setTimeout(() => document.getElementById('wa-btn-card')?.scrollIntoView({behavior: 'smooth', block: 'center'}), 100)" class="p-4 rounded-xl border-2 transition-all cursor-pointer text-left ${state.cardInstallment === m ? 'border-fintech-royal bg-blue-50' : 'border-slate-100 hover:border-slate-200'}">
+                                                <div onclick="setState({cardInstallment: ${m}}); setTimeout(() => document.getElementById('wa-btn-card')?.scrollIntoView({behavior: 'smooth', block: 'center'}), 100)" class="p-4 rounded-xl border-2 transition-all active:scale-[0.98] cursor-pointer text-left ${state.cardInstallment === m ? 'border-fintech-royal bg-blue-50 shadow-sm' : 'border-slate-100 bg-white hover:border-slate-200'}">
                                                     <div class="flex justify-between items-center mb-1">
-                                                        <span class="font-black text-lg">${m}x de ${formatBRL(instValue)}</span>
+                                                        <span class="font-extrabold text-lg text-slate-700">${m}x de ${formatBRL(instValue)}</span>
                                                         <span class="text-[10px] font-bold text-slate-400 uppercase">${formatBRL(total)}</span>
                                                     </div>
                                                 </div>
