@@ -185,6 +185,35 @@
             height: 8px;
         }
 
+        /* Sticky Button Styles */
+        .sticky-wa-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: linear-gradient(to top, rgba(248, 249, 250, 1) 80%, rgba(248, 249, 250, 0));
+            z-index: 100;
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+        }
+        .sticky-wa-container.visible {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .sticky-wa-button {
+            width: 100%;
+            max-width: 416px; /* Matches app-container inner width roughly */
+            box-shadow: 0 10px 25px -5px rgba(37, 211, 102, 0.4);
+            margin-bottom: constant(safe-area-inset-bottom);
+            margin-bottom: env(safe-area-inset-bottom);
+        }
+
         /* Slider Thumb Pulse on Change */
         .slider-pop::-webkit-slider-thumb {
             transform: scale(1.15);
@@ -429,6 +458,8 @@
     <main id="app-container" class="max-w-md mx-auto p-4 flex flex-col flex-1 w-full">
         <!-- Steps will be injected here -->
     </main>
+
+    <div id="sticky-wa-container" class="sticky-wa-container"></div>
 
     <footer class="p-8 text-center mt-auto">
         <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">VTMCred © 2026</p>
@@ -760,6 +791,7 @@
 
         const render = () => {
             const container = document.getElementById('app-container');
+            const stickyContainer = document.getElementById('sticky-wa-container');
             const subtitleContainer = document.getElementById('header-subtitle-container');
             const btnBack = document.getElementById('btn-back');
             const spacerLeft = document.getElementById('header-spacer-left');
@@ -958,7 +990,7 @@
                                         oninput="handleCredKeyInput(this.value)" 
                                         class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl py-4 pl-11 pr-4 font-bold text-slate-700 focus:border-fintech-royal outline-none transition-all placeholder:text-slate-300 placeholder:font-medium">
                                 </div>
-                                <div id="credkey-success-banner" class="p-3 bg-green-50 text-green-700 rounded-lg text-[10px] font-black border border-green-100 flex items-center gap-2 ${isKeyActive ? '' : 'hidden'}">
+                                <div id="credkey-success-banner" class="p-3 bg-green-50 text-green-700 rounded-lg text-[10px] font-black border border-green-100 flex items-center justify-center gap-2 ${isKeyActive ? '' : 'hidden'}">
                                     <i data-lucide="check-circle-2" class="lucide-xs"></i> DESCONTO APLICADO
                                 </div>
                             </div>
@@ -1026,7 +1058,7 @@
                             
                             <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Escolha o parcelamento:</p>
                             
-                            <div id="installment-list-loan" class="flex flex-col gap-2 overflow-y-auto max-h-[380px] pr-1 custom-scrollbar">
+                            <div id="installment-list-loan" class="flex flex-col gap-2 overflow-y-auto max-h-[380px] pb-24 pr-1 custom-scrollbar">
                                 ${simList.map(sim => `
                                     <div id="inst-loan-${sim.months}" onclick="setState({selectedInstallment: ${sim.months}}); setTimeout(() => document.getElementById('inst-loan-${sim.months}')?.scrollIntoView({behavior: 'smooth', block: 'nearest'}), 50)" class="p-4 rounded-xl border-2 transition-all active:scale-[0.98] cursor-pointer text-left ${state.selectedInstallment === sim.months ? 'border-fintech-royal bg-blue-50 shadow-sm' : 'border-slate-100 bg-white hover:border-slate-200'}">
                                         <div class="flex justify-between items-center mb-1">
@@ -1037,14 +1069,6 @@
                                     </div>
                                 `).join('')}
                             </div>
-                            
-                            ${state.selectedInstallment ? `
-                                <div class="mt-6 pt-6 border-t border-slate-100">
-                                    <button id="wa-btn-loan" onclick="handleSendWA()" class="w-full bg-[#25D366] text-white py-5 rounded-xl flex items-center justify-center gap-3 text-lg font-bold shadow-lg active:scale-95 transition-all">
-                                        <i data-lucide="message-circle" class="lucide-large"></i> Enviar pelo WhatsApp
-                                    </button>
-                                </div>
-                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -1171,7 +1195,7 @@
                             ${(isSpecial && state.cardAmount > 0) ? `
                                 <div class="space-y-4">
                                     <p class="text-[11px] text-slate-400 font-black uppercase tracking-widest text-left px-1">Selecione o parcelamento:</p>
-                                    <div id="installment-list-card" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                                    <div id="installment-list-card" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pb-24 pr-1 custom-scrollbar">
                                         ${Object.entries(rates).map(([months, rate]) => {
                                             const m = Number(months);
                                             const total = state.cardAmount * (1 + rate);
@@ -1186,14 +1210,11 @@
                                             `;
                                         }).join('')}
                                     </div>
-                                    <button id="wa-btn-card" onclick="handleSendCardWA()" ${!state.cardInstallment ? 'disabled' : ''} class="w-full bg-[#25D366] text-white py-5 rounded-xl flex items-center justify-center gap-3 text-lg font-bold shadow-lg active:scale-95 transition-all disabled:opacity-50 mt-4">
-                                        <i data-lucide="message-circle" class="lucide-large"></i> Chamar no WhatsApp
-                                    </button>
                                 </div>
                             ` : `
-                                <button onclick="handleSendCardWA()" class="w-full bg-[#25D366] text-white py-5 rounded-xl flex items-center justify-center gap-3 text-lg font-bold shadow-lg active:scale-95 transition-all">
-                                    <i data-lucide="message-circle" class="lucide-large"></i> Chamar no WhatsApp
-                                </button>
+                                <div class="pb-24">
+                                    <p class="text-sm text-slate-500 mb-4 text-center">Clique no botão abaixo para prosseguir com o seu banco.</p>
+                                </div>
                             `}
                         </div>
                     </div>
@@ -1214,6 +1235,24 @@
             if (state.step === 'amount' && !state.loanEntryAnimated) {
                 state.loanEntryAnimated = true;
                 setTimeout(triggerLoanEntryAnimation, 300);
+            }
+
+            // Handle Sticky WhatsApp Button
+            const isLoanResults = state.step === 'results';
+            const isCardResults = state.step === 'card_results';
+            const showSticky = (isLoanResults && state.selectedInstallment) || (isCardResults && (state.cardInstallment || (state.cardAmount > 0 && !(state.cardMethod === 'Aproximação' || state.cardMethod === 'Inserir Cartão' || state.cardMethod === 'Link de Pagamento'))));
+            
+            if (showSticky) {
+                const action = isLoanResults ? 'handleSendWA()' : 'handleSendCardWA()';
+                const label = isLoanResults ? 'Enviar pelo WhatsApp' : 'Chamar no WhatsApp';
+                stickyContainer.innerHTML = `
+                    <button onclick="${action}" class="sticky-wa-button bg-[#25D366] text-white py-5 px-6 rounded-xl flex items-center justify-center gap-3 text-lg font-bold transition-all active:scale-95 shadow-2xl">
+                        <i data-lucide="message-circle" class="lucide-large"></i> ${label}
+                    </button>
+                `;
+                stickyContainer.classList.add('visible');
+            } else {
+                stickyContainer.classList.remove('visible');
             }
 
             // Restore scroll positions
