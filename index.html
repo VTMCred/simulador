@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VTMCred - Simulador</title>
+    <title>VTMcred - Simulador</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -447,7 +447,7 @@
                 <i data-lucide="chevron-left"></i>
             </button>
             <div id="header-spacer-left" class="w-8"></div>
-            <h1 onclick="setState({step: 'hub'})" class="font-extrabold text-3xl md:text-4xl tracking-tight text-white leading-none cursor-pointer active:scale-95 transition-transform">VTMCred</h1>
+            <h1 onclick="setState({step: 'hub'})" class="font-extrabold text-3xl md:text-4xl tracking-tight text-white leading-none cursor-pointer active:scale-95 transition-transform">VTMcred</h1>
             <div id="header-spacer-right" class="w-8"></div>
         </div>
         <div class="flex justify-center" id="header-subtitle-container">
@@ -462,7 +462,7 @@
     <div id="sticky-wa-container" class="sticky-wa-container"></div>
 
     <footer class="p-8 text-center mt-auto">
-        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">VTMCred © 2026</p>
+        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">VTMcred © 2026</p>
     </footer>
 
     <!-- Help Popup -->
@@ -797,29 +797,18 @@
             const spacerLeft = document.getElementById('header-spacer-left');
 
             // Header Logic
-            const isCardPath = state.step.startsWith('card_');
-            const headerSubtitle = state.step === 'hub' ? 'Compromisso claro. Crédito direto!' : (isCardPath ? 'simulador cartão' : 'simulador credito');
-            
             if (state.step === 'hub') {
                 btnBack.classList.add('hidden');
                 spacerLeft.classList.remove('hidden');
-                if (!document.getElementById('animated-slogan')) {
-                    subtitleContainer.innerHTML = `<span id="animated-slogan" class="text-white/80 text-[10px] whitespace-nowrap uppercase tracking-[0.2em] font-medium text-center min-h-[1em]"></span>`;
-                    startSloganAnimation();
-                }
             } else {
-                stopSloganAnimation();
                 btnBack.classList.remove('hidden');
                 spacerLeft.classList.add('hidden');
-                // Only update subtitle if it's not the slogan or if subtitle changed
-                const currentSubtitleText = subtitleContainer.innerText;
-                if (!currentSubtitleText || currentSubtitleText !== headerSubtitle) {
-                    subtitleContainer.innerHTML = `
-                        <div class="inline-flex bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 items-center border border-white/10">
-                            <span class="text-white/80 text-[11px] font-medium whitespace-nowrap tracking-wide leading-none">${headerSubtitle}</span>
-                        </div>
-                    `;
-                }
+            }
+
+            // Always ensure the slogan is visible and animating
+            if (!document.getElementById('animated-slogan')) {
+                subtitleContainer.innerHTML = `<span id="animated-slogan" class="text-white/80 text-[10px] whitespace-nowrap uppercase tracking-[0.2em] font-medium text-center min-h-[1em]"></span>`;
+                startSloganAnimation();
             }
 
             // Optimization: Don't re-render the whole app-container if the step hasn't changed
@@ -920,7 +909,6 @@
                             </div>
                         </section>
                         <section class="mt-2">
-                            <h2 class="text-sm font-black text-slate-400 tracking-widest mb-4 px-1">Por que a VTMCred?</h2>
                             <div class="grid grid-cols-1 gap-3">
                                 <div class="bg-white p-5 rounded-xl border border-slate-100 flex items-center gap-4">
                                     <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-fintech-royal shrink-0">
@@ -996,7 +984,7 @@
                             </div>
 
                             <button id="loan-btn-continue" onclick="setState({step: 'results'})" ${state.amount === 0 ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-200 active:scale-95 disabled:opacity-30">
-                                Simular Parcelas <i data-lucide="chevron-right" class="lucide-xs"></i>
+                                SIMULAR PARCELAS <i data-lucide="chevron-right" class="lucide-xs"></i>
                             </button>
                         </div>
                     </div>
