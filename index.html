@@ -174,6 +174,13 @@
             width: 14px;
             height: 14px;
         }
+
+        /* Animation Utilities */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInFromTop { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .animate-in { animation-duration: 400ms; animation-fill-mode: forwards; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+        .fade-in { animation-name: fadeIn; }
+        .slide-in-from-top-2 { animation-name: slideInFromTop; }
         /* Custom styles for consistency with React app */
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
@@ -394,7 +401,7 @@
 
     <script>
         // --- Configuration & Constants ---
-        const DISCOUNT_KEY = "VTMCLIENTE4";
+        const DISCOUNT_KEY = "CLIENTEVTM5";
         const PHONE_NUMBER = "5593996589790";
 
         // --- Help Popup Logic ---
@@ -573,7 +580,9 @@
             cardMethod: '',
             cardAmount: 0,
             cardInstallment: null,
-            activeSimulator: 'loan' // 'loan' or 'card'
+            activeSimulator: 'loan', // 'loan' or 'card'
+            showCredKeyInput: false,
+            _lastShowCredKeyInput: false
         };
 
         const setState = (updates) => {
@@ -681,7 +690,9 @@
             // This prevents losing focus on inputs while typing if something else calls render()
             // We ONLY skip re-render for steps that have active inputs
             const typingSteps = ['amount', 'key', 'card_amount'];
-            if (currentRenderedStep === state.step && typingSteps.includes(state.step)) {
+            const credKeyToggled = state.step === 'amount' && state.showCredKeyInput !== state._lastShowCredKeyInput;
+            
+            if (currentRenderedStep === state.step && typingSteps.includes(state.step) && !credKeyToggled) {
                 // Update specific bits for the current step to keep it interactive without redraw
                 if(state.step === 'amount') {
                     const btn = document.getElementById('loan-btn-continue');
@@ -707,6 +718,10 @@
                     if(btn) btn.disabled = !state.cardAmount || state.cardAmount <= 0;
                 }
                 return;
+            }
+            
+            if (state.step === 'amount') {
+                state._lastShowCredKeyInput = state.showCredKeyInput;
             }
             
             currentRenderedStep = state.step;
@@ -813,25 +828,35 @@
                                 <input 
                                     type="number" 
                                     value="${state.amount || ''}" 
-                                    placeholder="Digite o valor liberado"
+                                    placeholder="0,00"
                                     oninput="setState({amount: Number(this.value)})"
-                                    class="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-4 pl-14 pr-6 text-3xl font-black text-slate-800 outline-none focus:border-fintech-royal focus:bg-white transition-all placeholder:text-[14px] placeholder:font-bold placeholder:text-slate-300"
+                                    class="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-4 pl-14 pr-6 text-3xl font-black text-slate-800 outline-none focus:border-fintech-royal focus:bg-white transition-all placeholder:text-slate-300"
                                     autofocus
                                 >
                             </div>
 
-                            <div class="space-y-6 mb-10">
-                                <div class="relative">
-                                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                                        <i data-lucide="key" class="lucide-sm"></i>
+                            <div class="space-y-4 mb-10">
+                                ${!state.showCredKeyInput && !isKeyActive ? `
+                                    <div class="text-center">
+                                        <button onclick="setState({showCredKeyInput: true})" class="text-fintech-royal text-sm font-medium hover:underline transition-all active:scale-95">
+                                            Possui uma CredKey? Clique aqui
+                                        </button>
                                     </div>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Possui CredKey? Digite aqui..." 
-                                        value="${state.credKey}" 
-                                        oninput="handleCredKeyInput(this.value)" 
-                                        class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl py-4 pl-11 pr-4 font-bold text-slate-700 focus:border-fintech-royal outline-none transition-all placeholder:text-slate-300 placeholder:font-medium">
-                                </div>
+                                ` : `
+                                    <div class="relative animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                                            <i data-lucide="key" class="lucide-sm"></i>
+                                        </div>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Digite sua CredKey" 
+                                            value="${state.credKey}" 
+                                            oninput="handleCredKeyInput(this.value)" 
+                                            class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl py-4 pl-11 pr-4 font-bold text-slate-700 focus:border-fintech-royal outline-none transition-all placeholder:text-slate-300 placeholder:font-medium"
+                                            autofocus
+                                        >
+                                    </div>
+                                `}
                                 <div id="credkey-success-banner" class="p-3 bg-green-50 text-green-700 rounded-lg text-[10px] font-black border border-green-100 flex items-center justify-center gap-2 ${isKeyActive ? '' : 'hidden'}">
                                     <i data-lucide="check-circle-2" class="lucide-xs"></i> DESCONTO APLICADO
                                 </div>
@@ -858,31 +883,28 @@
             } else if (state.step === 'results') {
                 const getProgressiveRate = (val) => {
                     if (!val || val <= 0) return 0.30;
-                    let total = 0;
-                    let remaining = val;
-                    
-                    // Até 500: 30%
-                    const b1 = Math.min(remaining, 500);
-                    total += b1 * 0.30;
-                    remaining -= b1;
-                    
-                    // 500 a 1000: 20%
-                    if (remaining > 0) {
-                        const b2 = Math.min(remaining, 500);
-                        total += b2 * 0.20;
-                        remaining -= b2;
-                    }
-                    
-                    // Acima de 1000: 15%
-                    if (remaining > 0) {
-                        total += remaining * 0.15;
-                    }
-                    
-                    return total / val;
+                    if (val <= 520) return 0.30;
+                    if (val <= 1020) return 0.20;
+                    return 0.15;
                 };
 
                 const baseRate = getProgressiveRate(state.amount);
-                const currentRate = state.credKey.toUpperCase() === DISCOUNT_KEY ? baseRate - 0.04 : baseRate;
+                let currentRate = baseRate;
+                let economyPercent = 0;
+                
+                if (state.credKey.toUpperCase() === DISCOUNT_KEY) {
+                    if (baseRate === 0.30) {
+                        currentRate = 0.22;
+                        economyPercent = 8;
+                    } else if (baseRate === 0.20) {
+                        currentRate = 0.15;
+                        economyPercent = 5;
+                    } else if (baseRate === 0.15) {
+                        currentRate = 0.10;
+                        economyPercent = 5;
+                    }
+                }
+                
                 const maxInst = state.amount < 200 ? 2 : (state.amount < 1000 ? 5 : 12);
                 
                 const simList = Array.from({ length: maxInst }, (_, i) => {
@@ -894,6 +916,11 @@
 
                 content = `
                     <div class="flex-1 flex flex-col gap-4 step-transition pt-4">
+                        ${economyPercent > 0 ? `
+                            <div class="animate-in fade-in slide-in-from-top-2 duration-500 bg-fintech-royal/10 border border-fintech-royal/20 rounded-xl p-3 text-center">
+                                <p class="text-fintech-royal text-[13px] sm:text-sm font-black whitespace-nowrap">Você ganhou ${economyPercent}% de desconto</p>
+                            </div>
+                        ` : ''}
                         <div class="card bg-white p-6 rounded-2xl border border-slate-200 shadow-xl">
                             <header class="flex justify-between items-center mb-6">
                                 <h2 class="text-xl font-black text-slate-800">Simulação</h2>
@@ -1012,9 +1039,9 @@
                                     id="card-amount-input"
                                     type="number" 
                                     value="${state.cardAmount || ''}" 
-                                    placeholder="Digite o valor do seu limite"
+                                    placeholder="0,00"
                                     oninput="state.cardAmount = Number(this.value); document.getElementById('card-btn-continue').disabled = !state.cardAmount || state.cardAmount <= 0"
-                                    class="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-4 pl-14 pr-6 text-3xl font-black text-slate-800 outline-none focus:border-fintech-royal focus:bg-white transition-all placeholder:text-[14px] placeholder:font-bold placeholder:text-slate-300"
+                                    class="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-4 pl-14 pr-6 text-3xl font-black text-slate-800 outline-none focus:border-fintech-royal focus:bg-white transition-all placeholder:text-slate-300"
                                     autofocus
                                 >
                             </div>
@@ -1135,8 +1162,22 @@
         document.getElementById('btn-back').addEventListener('click', goBack);
 
         const handleSendWA = () => {
-            const baseRate = state.amount < 1000 ? 0.20 : 0.15;
-            const currentRate = state.credKey.toUpperCase() === DISCOUNT_KEY ? baseRate - 0.04 : baseRate;
+            const getProgressiveRate = (val) => {
+                if (!val || val <= 0) return 0.30;
+                if (val <= 520) return 0.30;
+                if (val <= 1020) return 0.20;
+                return 0.15;
+            };
+
+            const baseRate = getProgressiveRate(state.amount);
+            let currentRate = baseRate;
+            
+            if (state.credKey.toUpperCase() === DISCOUNT_KEY) {
+                if (baseRate === 0.30) currentRate = 0.22;
+                else if (baseRate === 0.20) currentRate = 0.15;
+                else if (baseRate === 0.15) currentRate = 0.10;
+            }
+            
             const months = state.selectedInstallment;
             const total = Math.round(state.amount * (1 + currentRate * months));
             const inst = Math.round(total / months);
