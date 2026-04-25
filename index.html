@@ -804,19 +804,18 @@
                 content = `
                     <div class="flex-1 flex flex-col pt-4 step-transition">
                         <div class="card bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-6">
-                            <div class="text-center mb-10">
-                                <h2 class="text-2xl font-black text-slate-800 mb-2">Valor liberado</h2>
+                            <div class="text-center mb-6">
                                 <p class="text-slate-500 font-medium">Informe o valor aprovado para você</p>
                             </div>
                             
-                            <div class="relative mb-12 group">
-                                <div class="absolute left-6 top-1/2 -translate-y-1/2 text-3xl font-black text-slate-300 group-focus-within:text-fintech-royal transition-colors">R$</div>
+                            <div class="relative mb-8 group">
+                                <div class="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300 group-focus-within:text-fintech-royal transition-colors">R$</div>
                                 <input 
                                     type="number" 
                                     value="${state.amount || ''}" 
                                     placeholder="Digite o valor liberado"
                                     oninput="setState({amount: Number(this.value)})"
-                                    class="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-8 pl-20 pr-6 text-4xl font-black text-slate-800 outline-none focus:border-fintech-royal focus:bg-white transition-all placeholder:text-[14px] placeholder:font-bold placeholder:text-slate-300"
+                                    class="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-4 pl-14 pr-6 text-3xl font-black text-slate-800 outline-none focus:border-fintech-royal focus:bg-white transition-all placeholder:text-[14px] placeholder:font-bold placeholder:text-slate-300"
                                     autofocus
                                 >
                             </div>
@@ -1003,20 +1002,19 @@
                 content = `
                     <div class="flex-1 flex flex-col pt-4 step-transition">
                         <div class="card bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-6">
-                            <div class="text-center mb-10">
-                                <h2 class="text-2xl font-black text-slate-800 mb-2">Quanto do seu limite deseja usar?</h2>
-                                <p class="text-slate-500 font-medium">Escolha o valor que deseja converter em PIX</p>
+                            <div class="text-center mb-6">
+                                <p class="text-slate-500 font-medium">Escolha o valor para receber em PIX</p>
                             </div>
                             
-                            <div class="relative mb-12 group">
-                                <div class="absolute left-6 top-1/2 -translate-y-1/2 text-3xl font-black text-slate-300 group-focus-within:text-fintech-royal transition-colors">R$</div>
+                            <div class="relative mb-8 group">
+                                <div class="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300 group-focus-within:text-fintech-royal transition-colors">R$</div>
                                 <input 
                                     id="card-amount-input"
                                     type="number" 
                                     value="${state.cardAmount || ''}" 
                                     placeholder="Digite o valor do seu limite"
                                     oninput="state.cardAmount = Number(this.value); document.getElementById('card-btn-continue').disabled = !state.cardAmount || state.cardAmount <= 0"
-                                    class="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-8 pl-20 pr-6 text-4xl font-black text-slate-800 outline-none focus:border-fintech-royal focus:bg-white transition-all placeholder:text-[14px] placeholder:font-bold placeholder:text-slate-300"
+                                    class="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-4 pl-14 pr-6 text-3xl font-black text-slate-800 outline-none focus:border-fintech-royal focus:bg-white transition-all placeholder:text-[14px] placeholder:font-bold placeholder:text-slate-300"
                                     autofocus
                                 >
                             </div>
