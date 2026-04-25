@@ -572,7 +572,8 @@
             cardBank: '',
             cardMethod: '',
             cardAmount: 0,
-            cardInstallment: null
+            cardInstallment: null,
+            activeSimulator: 'loan' // 'loan' or 'card'
         };
 
         const setState = (updates) => {
@@ -582,7 +583,13 @@
 
             if (stepChanged) {
                 window.scrollTo(0, 0);
-                if (state.step === 'amount') state.loanEntryAnimated = false;
+                if (state.step === 'amount') {
+                    state.loanEntryAnimated = false;
+                    state.activeSimulator = 'loan';
+                }
+                if (state.step === 'card_amount') {
+                    state.activeSimulator = 'card';
+                }
                 if (oldStep === 'amount' && state.step === 'welcome') state.amount = 0; // Reset if going back
                 
                 // Trigger Loading logic
@@ -602,7 +609,11 @@
 
                     const duration = 4500 + Math.random() * 1000; // 4.5s to 5.5s to accommodate messages
                     setTimeout(() => {
-                        setState({ step: 'results' });
+                        if (state.activeSimulator === 'card') {
+                            setState({ step: 'card_results' });
+                        } else {
+                            setState({ step: 'results' });
+                        }
                     }, duration);
                 }
             }
@@ -794,8 +805,8 @@
                     <div class="flex-1 flex flex-col pt-4 step-transition">
                         <div class="card bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-6">
                             <div class="text-center mb-10">
-                                <h2 class="text-2xl font-black text-slate-800 mb-2">Simulador de Crédito</h2>
-                                <p class="text-slate-500 font-medium">Digite o valor que você precisa</p>
+                                <h2 class="text-2xl font-black text-slate-800 mb-2">Valor liberado</h2>
+                                <p class="text-slate-500 font-medium">Informe o valor aprovado para você</p>
                             </div>
                             
                             <div class="relative mb-12 group">
@@ -803,9 +814,9 @@
                                 <input 
                                     type="number" 
                                     value="${state.amount || ''}" 
-                                    placeholder="0,00"
+                                    placeholder="Digite o valor liberado"
                                     oninput="setState({amount: Number(this.value)})"
-                                    class="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-8 pl-20 pr-6 text-4xl font-black text-slate-800 outline-none focus:border-fintech-royal focus:bg-white transition-all placeholder:text-slate-200"
+                                    class="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-8 pl-20 pr-6 text-4xl font-black text-slate-800 outline-none focus:border-fintech-royal focus:bg-white transition-all placeholder:text-[14px] placeholder:font-bold placeholder:text-slate-300"
                                     autofocus
                                 >
                             </div>
@@ -828,7 +839,7 @@
                             </div>
 
                             <button id="loan-btn-continue" onclick="setState({step: 'loading'})" ${state.amount <= 0 ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-200 active:scale-95 disabled:opacity-30">
-                                SIMULAR PARCELAS <i data-lucide="chevron-right" class="lucide-xs"></i>
+                                SIMULAR AGORA <i data-lucide="chevron-right" class="lucide-xs"></i>
                             </button>
                         </div>
                     </div>
@@ -990,16 +1001,28 @@
                 `;
             } else if (state.step === 'card_amount') {
                 content = `
-                    <div class="flex-1 flex flex-col gap-6 step-transition">
-                        <h2 class="text-lg font-bold px-1 text-slate-400 uppercase tracking-tighter">Valor</h2>
-                        <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-blue-900/5">
-                            <p class="text-slate-600 text-lg mb-8 leading-relaxed">Quanto você quer usar do seu limite?</p>
-                            <div class="relative border-b-2 border-fintech-royal py-2 mb-10 group">
-                                <span class="text-2xl font-bold mr-2 text-fintech-royal">R$</span>
-                                <input id="card-amount-input" type="number" placeholder="0,00" value="${state.cardAmount || ''}" oninput="state.cardAmount = Number(this.value); document.getElementById('card-btn-continue').disabled = !state.cardAmount || state.cardAmount <= 0" class="w-full bg-transparent text-4xl font-black focus:outline-none placeholder:text-slate-100">
+                    <div class="flex-1 flex flex-col pt-4 step-transition">
+                        <div class="card bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-6">
+                            <div class="text-center mb-10">
+                                <h2 class="text-2xl font-black text-slate-800 mb-2">Quanto do seu limite deseja usar?</h2>
+                                <p class="text-slate-500 font-medium">Escolha o valor que deseja converter em PIX</p>
                             </div>
-                            <button id="card-btn-continue" onclick="if(state.cardAmount > 0) setState({step: 'card_results'})" ${(!state.cardAmount || state.cardAmount <= 0) ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-bold transition-all disabled:opacity-30 flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
-                                Continuar <i data-lucide="chevron-right" class="lucide-xs"></i>
+                            
+                            <div class="relative mb-12 group">
+                                <div class="absolute left-6 top-1/2 -translate-y-1/2 text-3xl font-black text-slate-300 group-focus-within:text-fintech-royal transition-colors">R$</div>
+                                <input 
+                                    id="card-amount-input"
+                                    type="number" 
+                                    value="${state.cardAmount || ''}" 
+                                    placeholder="Digite o valor do seu limite"
+                                    oninput="state.cardAmount = Number(this.value); document.getElementById('card-btn-continue').disabled = !state.cardAmount || state.cardAmount <= 0"
+                                    class="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-8 pl-20 pr-6 text-4xl font-black text-slate-800 outline-none focus:border-fintech-royal focus:bg-white transition-all placeholder:text-[14px] placeholder:font-bold placeholder:text-slate-300"
+                                    autofocus
+                                >
+                            </div>
+
+                            <button id="card-btn-continue" onclick="if(state.cardAmount > 0) setState({step: 'loading'})" ${(!state.cardAmount || state.cardAmount <= 0) ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-200 active:scale-95 disabled:opacity-30">
+                                SIMULAR AGORA <i data-lucide="chevron-right" class="lucide-xs"></i>
                             </button>
                         </div>
                     </div>
