@@ -27,6 +27,10 @@
         }
 
         /* Essential Reset */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #F8F9FA;
@@ -69,6 +73,139 @@
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 10px;
+        }
+        
+        /* Intelligence Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #002BFF;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -10px;
+            box-shadow: 0 4px 10px rgba(0, 43, 255, 0.3);
+            transition: all 0.2s ease;
+            border: 3px solid #fff;
+        }
+        input[type=range]:active::-webkit-slider-thumb {
+            transform: scale(1.1);
+            background: #2E5BFF;
+        }
+        
+        /* Refactored Flip Counter */
+        .flip-counter {
+            display: inline-flex;
+            gap: 6px;
+            justify-content: center;
+            height: 56px; /* Strict height */
+        }
+        .flip-box {
+            width: 42px;
+            height: 56px;
+            background: #e2e8f0; /* Same as track */
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            line-height: 1;
+        }
+        .flip-box span {
+            font-size: 32px;
+            font-weight: 900;
+            display: block;
+            height: 56px;
+            line-height: 56px;
+            text-align: center;
+        }
+        .flip-prefix-box {
+            color: #002BFF; /* bg-fintech-royal */
+        }
+        .flip-digit-box {
+            color: #2E5BFF; /* bg-fintech-btn */
+        }
+        .flip-digit-strip {
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 56px;
+            width: 100%;
+        }
+        .flip-digit-strip div {
+            height: 56px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            line-height: normal;
+        }
+        .animate-loan-entry {
+            animation: loanEntryFadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        @keyframes loanEntryFadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Slider Tick Marks */
+        .slider-ticks {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 4px;
+            margin-top: -8px;
+            pointer-events: none;
+        }
+        .slider-tick {
+            width: 1px;
+            height: 6px;
+            background: #cbd5e1;
+            border-radius: 1px;
+        }
+        .slider-tick.active {
+            background: #2E5BFF;
+            height: 8px;
+        }
+
+        /* Slider Thumb Pulse on Change */
+        .slider-pop::-webkit-slider-thumb {
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(0, 43, 255, 0.5) !important;
+        }
+
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        input[type=range]::-moz-range-thumb {
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #002BFF;
+            cursor: pointer;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 10px rgba(0, 43, 255, 0.3);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
@@ -484,6 +621,25 @@
             7: 0.3736, 8: 0.4000, 9: 0.4151, 10: 0.4276, 11: 0.4390, 12: 0.4500
         };
 
+        const BANK_RULES = {
+            'Nubank': ['Mastercard'],
+            'Inter': ['Mastercard'],
+            'C6 Bank': ['Mastercard'],
+            'Neon': ['Visa'],
+            'PagBank': ['Visa'],
+            'Itaú': ['Mastercard', 'Visa', 'Elo'],
+            'Bradesco': ['Mastercard', 'Visa', 'Elo'],
+            'Santander': ['Mastercard', 'Visa'],
+            'Banco do Brasil': ['Visa', 'Mastercard', 'Elo'],
+            'Caixa': ['Visa', 'Elo'],
+            'Outro': ['Visa', 'Mastercard', 'Elo', 'American Express', 'Hipercard', 'Outra']
+        };
+
+        const LOAN_VALUES = [
+            0, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000,
+            1500, 2000, 2500, 3000, 3500, 4000
+        ];
+
         // --- State Management ---
         let state = {
             step: 'hub',
@@ -498,21 +654,29 @@
         };
 
         const setState = (updates) => {
+            const oldStep = state.step;
             const stepChanged = updates.step && updates.step !== state.step;
             state = { ...state, ...updates };
-            if (stepChanged) window.scrollTo(0, 0); 
+            if (stepChanged) {
+                window.scrollTo(0, 0);
+                if (state.step === 'amount') state.loanEntryAnimated = false;
+                if (oldStep === 'amount' && state.step === 'welcome') state.amount = 0; // Reset if going back
+            }
             render();
         };
 
         // --- Navigation ---
         const goBack = () => {
-            const { step, cardMethod } = state;
-            if (step === 'welcome' || step === 'card_brand') setState({ step: 'hub' });
+            const { step, cardMethod, cardBank } = state;
+            if (step === 'welcome' || step === 'card_bank') setState({ step: 'hub' });
             else if (step === 'amount') setState({ step: 'welcome' });
-            else if (step === 'key') setState({ step: 'amount' });
-            else if (step === 'results') setState({ step: 'key' });
-            else if (step === 'card_bank') setState({ step: 'card_brand' });
-            else if (step === 'card_method') setState({ step: 'card_bank' });
+            else if (step === 'results') setState({ step: 'amount' });
+            else if (step === 'card_brand') setState({ step: 'card_bank' });
+            else if (step === 'card_method') {
+                const brands = BANK_RULES[cardBank] || [];
+                if (brands.length === 1) setState({ step: 'card_bank' });
+                else setState({ step: 'card_brand' });
+            }
             else if (step === 'card_amount') setState({ step: 'card_method' });
             else if (step === 'card_results') {
                 if (cardMethod === 'Aproximação' || cardMethod === 'Inserir Cartão' || cardMethod === 'Link de Pagamento') setState({ step: 'card_amount' });
@@ -522,6 +686,64 @@
 
         // --- Logic Helper ---
         const formatBRL = (val) => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }).replace('R$', 'R$ ');
+
+        const getFlipCounterHTML = (value, entry = false) => {
+            const digits = String(value).padStart(4, '0').split('');
+            return `
+                <div class="flip-counter ${entry ? 'animate-loan-entry' : ''}">
+                    <div class="flip-box flip-prefix-box"><span>R</span></div>
+                    <div class="flip-box flip-prefix-box"><span>$</span></div>
+                    ${digits.map((d, i) => `
+                        <div class="flip-box flip-digit-box">
+                            <div class="flip-digit-strip" id="flip-strip-${i}" style="transform: translateY(-${parseInt(d) * 56}px)">
+                                ${[0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9].map(n => `<div><span>${n}</span></div>`).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        };
+
+        const updateFlipCounter = (value) => {
+            const digits = String(value).padStart(4, '0').split('');
+            const slider = document.getElementById('loan-range-slider');
+            const currentValueIndex = LOAN_VALUES.indexOf(value);
+            
+            // Update Active Ticks
+            const ticks = document.querySelectorAll('.slider-tick');
+            ticks.forEach((tick, idx) => {
+                if (idx <= currentValueIndex) tick.classList.add('active');
+                else tick.classList.remove('active');
+            });
+
+            // Haptic/Visual Feedback
+            if (slider && state.amount !== value) {
+                if (navigator.vibrate) navigator.vibrate(10);
+                slider.classList.add('slider-pop');
+                setTimeout(() => slider.classList.remove('slider-pop'), 100);
+            }
+
+            digits.forEach((d, i) => {
+                const strip = document.getElementById(`flip-strip-${i}`);
+                if (strip) {
+                    strip.style.transform = `translateY(-${parseInt(d) * 56}px)`;
+                }
+            });
+        };
+
+        const triggerLoanEntryAnimation = () => {
+            const strips = [0,1,2,3].map(i => document.getElementById(`flip-strip-${i}`));
+            strips.forEach((strip, i) => {
+                if (!strip) return;
+                strip.style.transition = 'none';
+                // start at index 10+ (second set of 0-9)
+                strip.style.transform = `translateY(-${(Math.floor(Math.random() * 5) + 12) * 56}px)`;
+                setTimeout(() => {
+                    strip.style.transition = `transform ${1 + (i * 0.15)}s cubic-bezier(0.15, 0.85, 0.35, 1)`;
+                    strip.style.transform = 'translateY(0)';
+                }, 50);
+            });
+        };
 
         const handleCredKeyInput = (val) => {
             state.credKey = val;
@@ -544,13 +766,13 @@
 
             // Header Logic
             const isCardPath = state.step.startsWith('card_');
-            const headerSubtitle = state.step === 'hub' ? 'Compromisso claro. Crédito direto!' : (isCardPath ? 'Simulador Cartão' : 'Simulador de Crédito');
+            const headerSubtitle = state.step === 'hub' ? 'Compromisso claro. Crédito direto!' : (isCardPath ? 'simulador cartão' : 'simulador credito');
             
             if (state.step === 'hub') {
                 btnBack.classList.add('hidden');
                 spacerLeft.classList.remove('hidden');
                 if (!document.getElementById('animated-slogan')) {
-                    subtitleContainer.innerHTML = `<span id="animated-slogan" class="text-white/80 text-[12px] whitespace-nowrap uppercase tracking-[0.15em] font-medium text-center min-h-[1em]"></span>`;
+                    subtitleContainer.innerHTML = `<span id="animated-slogan" class="text-white/80 text-[10px] whitespace-nowrap uppercase tracking-[0.2em] font-medium text-center min-h-[1em]"></span>`;
                     startSloganAnimation();
                 }
             } else {
@@ -561,11 +783,8 @@
                 const currentSubtitleText = subtitleContainer.innerText;
                 if (!currentSubtitleText || currentSubtitleText !== headerSubtitle) {
                     subtitleContainer.innerHTML = `
-                        <div class="inline-flex bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 items-center gap-2 border border-white/20">
-                            <div class="w-4 h-4 rounded-full border-2 border-white flex items-center justify-center">
-                                <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
-                            </div>
-                            <span class="text-white/90 text-[14px] whitespace-nowrap uppercase tracking-widest leading-none">${headerSubtitle}</span>
+                        <div class="inline-flex bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 items-center border border-white/10">
+                            <span class="text-white/80 text-[11px] font-medium whitespace-nowrap tracking-wide leading-none">${headerSubtitle}</span>
                         </div>
                     `;
                 }
@@ -580,6 +799,13 @@
                 if(state.step === 'amount') {
                     const btn = document.getElementById('loan-btn-continue');
                     if(btn) btn.disabled = !state.amount || state.amount <= 0;
+                    
+                    const isKeyActive = state.credKey.toUpperCase() === DISCOUNT_KEY;
+                    const banner = document.getElementById('credkey-success-banner');
+                    if(banner) {
+                        if(isKeyActive) banner.classList.remove('hidden');
+                        else banner.classList.add('hidden');
+                    }
                 }
                 if(state.step === 'key') {
                     const isKeyActive = state.credKey.toUpperCase() === DISCOUNT_KEY;
@@ -620,7 +846,7 @@
                                 </div>
                                 <i data-lucide="chevron-right" class="text-slate-300 lucide-small"></i>
                             </button>
-                            <button onclick="setState({step: 'card_brand'})" class="animate-fade-up delay-200 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 text-left transition-all active:scale-95 group hover:border-fintech-royal">
+                            <button onclick="setState({step: 'card_bank'})" class="animate-fade-up delay-200 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 text-left transition-all active:scale-95 group hover:border-fintech-royal">
                                 <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 shrink-0 group-hover:bg-purple-600 group-hover:text-white transition-colors">
                                     <i data-lucide="credit-card" class="lucide-large"></i>
                                 </div>
@@ -656,7 +882,7 @@
                                 <p class="text-slate-800 text-lg leading-snug mb-6">
                                     Simulação <span class="font-black text-fintech-royal">transparente</span> em segundos, com condições claras.
                                 </p>
-                                <button onclick="setState({step: 'amount'})" class="w-full bg-fintech-btn text-white py-4 rounded-xl font-black text-base hover:shadow-lg hover:shadow-blue-200 transition-all uppercase tracking-widest">
+                                <button onclick="setState({step: 'amount', amount: 0})" class="w-full bg-fintech-btn text-white py-4 rounded-xl font-black text-base hover:shadow-lg hover:shadow-blue-200 transition-all uppercase tracking-widest">
                                     SIMULAR AGORA
                                 </button>
                             </div>
@@ -687,37 +913,59 @@
                     </div>
                 `;
             } else if (state.step === 'amount') {
+                // Ensure state.amount is valid
+                if (state.amount === undefined) state.amount = 0;
+                const isKeyActive = state.credKey.toUpperCase() === DISCOUNT_KEY;
+                
+                const currentValueIndex = LOAN_VALUES.indexOf(state.amount);
+
                 content = `
                     <div class="flex-1 flex flex-col gap-6 step-transition">
                         <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-blue-900/5">
-                            <p class="text-slate-600 text-lg mb-8 font-medium">Que valor foi disponibilizado pra você?</p>
-                            <div class="relative border-b-2 border-fintech-royal py-2 mb-10 group">
-                                <span class="text-2xl font-black mr-2 text-fintech-royal">R$</span>
-                                <input id="loan-amount-input" type="number" placeholder="0,00" value="${state.amount || ''}" oninput="state.amount = Number(this.value); document.getElementById('loan-btn-continue').disabled = !state.amount || state.amount <= 0" class="w-full bg-transparent text-4xl font-black focus:outline-none placeholder:text-slate-100">
+                            <p class="text-slate-400 text-xs mb-8 font-black text-center uppercase tracking-widest">VALOR LIBERADO</p>
+                            
+                            <div id="flip-counter-container" class="mb-10 min-h-[60px] flex items-center justify-center">
+                                ${getFlipCounterHTML(state.amount, !state.loanEntryAnimated)}
                             </div>
-                            <button id="loan-btn-continue" onclick="if(state.amount > 0) setState({step: 'key'})" ${(!state.amount || state.amount <= 0) ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all disabled:opacity-30 flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
-                                Continuar <i data-lucide="chevron-right" class="lucide-xs"></i>
+
+                            <div class="px-2 mb-10">
+                                <div class="relative py-4">
+                                    <input 
+                                        type="range" 
+                                        id="loan-range-slider"
+                                        min="0" 
+                                        max="${LOAN_VALUES.length - 1}" 
+                                        step="1"
+                                        value="${currentValueIndex}" 
+                                        oninput="const val = LOAN_VALUES[this.value]; updateFlipCounter(val); state.amount = val; document.getElementById('loan-btn-continue').disabled = (val === 0);"
+                                        onchange="setState({amount: state.amount})"
+                                        class="w-full relative z-10"
+                                    >
+                                    <!-- Visual Ticks -->
+                                    <div class="slider-ticks">
+                                        ${LOAN_VALUES.map((_, i) => `<div class="slider-tick ${i <= currentValueIndex ? 'active' : ''}"></div>`).join('')}
+                                    </div>
+                                    <div class="text-center mt-6">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Arraste para escolher o valor</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4 mb-4">
+                                <div class="relative">
+                                    <i data-lucide="ticket" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 lucide-small"></i>
+                                    <input type="text" placeholder="Digite sua CredKey" value="${state.credKey}" 
+                                        oninput="handleCredKeyInput(this.value)" 
+                                        class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl py-4 pl-11 pr-4 font-bold text-slate-700 focus:border-fintech-royal outline-none transition-all placeholder:text-slate-300 placeholder:font-medium">
+                                </div>
+                                <div id="credkey-success-banner" class="p-3 bg-green-50 text-green-700 rounded-lg text-[10px] font-black border border-green-100 flex items-center gap-2 ${isKeyActive ? '' : 'hidden'}">
+                                    <i data-lucide="check-circle-2" class="lucide-xs"></i> DESCONTO APLICADO
+                                </div>
+                            </div>
+
+                            <button id="loan-btn-continue" onclick="setState({step: 'results'})" ${state.amount === 0 ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-200 active:scale-95 disabled:opacity-30">
+                                Simular Parcelas <i data-lucide="chevron-right" class="lucide-xs"></i>
                             </button>
-                        </div>
-                    </div>
-                `;
-            } else if (state.step === 'key') {
-                const isKeyActive = state.credKey.toUpperCase() === DISCOUNT_KEY;
-                content = `
-                    <div class="flex-1 flex flex-col gap-6 step-transition">
-                        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-xl mt-4">
-                            <div class="flex items-center gap-3 mb-6 text-fintech-royal">
-                                <i data-lucide="ticket"></i>
-                                <span class="font-black text-slate-800 text-lg">Possui uma CredKey?</span>
-                            </div>
-                            <input type="text" placeholder="Digite sua chave" value="${state.credKey}" oninput="handleCredKeyInput(this.value)" class="w-full border-2 border-slate-100 rounded-xl p-4 mb-6 text-center font-bold focus:border-fintech-royal outline-none transition-colors text-lg placeholder:text-slate-300 placeholder:font-medium placeholder:normal-case placeholder:text-sm">
-                            <div id="credkey-success-banner" class="mb-8 p-4 bg-green-50 text-green-700 rounded-xl text-xs font-black border border-green-100 flex items-center gap-2 ${isKeyActive ? '' : 'hidden'}">
-                                <i data-lucide="check-circle-2" class="lucide-xs"></i> CredKey aplicada! Taxa reduzida em 4%.
-                            </div>
-                            <div class="flex flex-col gap-3">
-                                <button onclick="setState({step: 'results'})" class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black uppercase tracking-wider shadow-lg shadow-blue-200">Ver simulação</button>
-                                <button onclick="setState({credKey: '', step: 'results'})" class="w-full text-fintech-btn font-black text-xs py-2 tracking-tight">Não tenho uma CredKey</button>
-                            </div>
                         </div>
                     </div>
                 `;
@@ -778,9 +1026,9 @@
                             
                             <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Escolha o parcelamento:</p>
                             
-                            <div class="flex flex-col gap-2 overflow-y-auto max-h-[380px] pr-1 custom-scrollbar">
+                            <div id="installment-list-loan" class="flex flex-col gap-2 overflow-y-auto max-h-[380px] pr-1 custom-scrollbar">
                                 ${simList.map(sim => `
-                                    <div onclick="setState({selectedInstallment: ${sim.months}}); setTimeout(() => document.getElementById('wa-btn-loan')?.scrollIntoView({behavior: 'smooth', block: 'center'}), 100)" class="p-4 rounded-xl border-2 transition-all active:scale-[0.98] cursor-pointer text-left ${state.selectedInstallment === sim.months ? 'border-fintech-royal bg-blue-50 shadow-sm' : 'border-slate-100 bg-white hover:border-slate-200'}">
+                                    <div id="inst-loan-${sim.months}" onclick="setState({selectedInstallment: ${sim.months}}); setTimeout(() => document.getElementById('inst-loan-${sim.months}')?.scrollIntoView({behavior: 'smooth', block: 'nearest'}), 50)" class="p-4 rounded-xl border-2 transition-all active:scale-[0.98] cursor-pointer text-left ${state.selectedInstallment === sim.months ? 'border-fintech-royal bg-blue-50 shadow-sm' : 'border-slate-100 bg-white hover:border-slate-200'}">
                                         <div class="flex justify-between items-center mb-1">
                                             <span class="text-md font-extrabold text-slate-700">${sim.months}x Parcelas</span>
                                             <span class="text-[10px] font-bold text-slate-400">${formatBRL(sim.total)}</span>
@@ -801,13 +1049,16 @@
                     </div>
                 `;
             } else if (state.step === 'card_brand') {
-                const brands = ['Visa', 'Mastercard', 'Elo', 'American Express', 'Hipercard', 'Outra'];
+                const brands = BANK_RULES[state.cardBank] || [];
                 content = `
                     <div class="flex flex-col gap-6 pt-6 step-transition">
-                        <h2 class="text-lg font-bold px-1 text-slate-400 uppercase tracking-tight">Qual a bandeira?</h2>
+                        <div class="px-1">
+                            <h2 class="text-lg font-bold text-slate-400 uppercase tracking-tight">Qual a bandeira?</h2>
+                            <p class="text-sm text-slate-500 font-medium">${state.cardBank}</p>
+                        </div>
                         <div class="grid grid-cols-1 gap-3">
                             ${brands.map(brand => `
-                                <button onclick="setState({cardBrand: '${brand}', step: 'card_bank'})" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between font-black text-slate-800 hover:border-fintech-royal active:scale-95 transition-all">
+                                <button onclick="setState({cardBrand: '${brand}', step: 'card_method'})" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between font-black text-slate-800 hover:border-fintech-royal active:scale-95 transition-all">
                                     <div class="flex items-center gap-3">
                                         <i data-lucide="credit-card" class="text-slate-400 lucide-small"></i>
                                         ${brand}
@@ -819,20 +1070,29 @@
                     </div>
                 `;
             } else if (state.step === 'card_bank') {
-                const banks = ['Banco do Brasil', 'Itaú', 'Bradesco', 'Santander', 'Nubank', 'Caixa', 'Inter', 'Outro'];
+                const banks = Object.keys(BANK_RULES);
                 content = `
                     <div class="flex flex-col gap-6 pt-6 step-transition">
                         <h2 class="text-lg font-bold px-1 text-slate-400 uppercase tracking-tight">Qual o banco?</h2>
                         <div class="grid grid-cols-1 gap-3">
-                            ${banks.map(bank => `
-                                <button onclick="setState({cardBank: '${bank}', step: 'card_method'})" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between font-black text-slate-800 hover:border-fintech-royal active:scale-95 transition-all">
-                                    <div class="flex items-center gap-3">
-                                        <i data-lucide="building-2" class="text-slate-400 lucide-small"></i>
-                                        ${bank}
-                                    </div>
-                                    <i data-lucide="chevron-right" class="text-slate-300 lucide-small"></i>
-                                </button>
-                            `).join('')}
+                            ${banks.map(bank => {
+                                const brands = BANK_RULES[bank];
+                                let onClickAction = '';
+                                if (brands.length === 1) {
+                                    onClickAction = `setState({cardBank: '${bank}', cardBrand: '${brands[0]}', step: 'card_method'})`;
+                                } else {
+                                    onClickAction = `setState({cardBank: '${bank}', step: 'card_brand'})`;
+                                }
+                                return `
+                                    <button onclick="${onClickAction}" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between font-black text-slate-800 hover:border-fintech-royal active:scale-95 transition-all">
+                                        <div class="flex items-center gap-3">
+                                            <i data-lucide="building-2" class="text-slate-400 lucide-small"></i>
+                                            ${bank}
+                                        </div>
+                                        <i data-lucide="chevron-right" class="text-slate-300 lucide-small"></i>
+                                    </button>
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                 `;
@@ -911,13 +1171,13 @@
                             ${(isSpecial && state.cardAmount > 0) ? `
                                 <div class="space-y-4">
                                     <p class="text-[11px] text-slate-400 font-black uppercase tracking-widest text-left px-1">Selecione o parcelamento:</p>
-                                    <div class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                                    <div id="installment-list-card" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
                                         ${Object.entries(rates).map(([months, rate]) => {
                                             const m = Number(months);
                                             const total = state.cardAmount * (1 + rate);
                                             const instValue = total / m;
                                             return `
-                                                <div onclick="setState({cardInstallment: ${m}}); setTimeout(() => document.getElementById('wa-btn-card')?.scrollIntoView({behavior: 'smooth', block: 'center'}), 100)" class="p-4 rounded-xl border-2 transition-all active:scale-[0.98] cursor-pointer text-left ${state.cardInstallment === m ? 'border-fintech-royal bg-blue-50 shadow-sm' : 'border-slate-100 bg-white hover:border-slate-200'}">
+                                                <div id="inst-card-${m}" onclick="setState({cardInstallment: ${m}}); setTimeout(() => document.getElementById('inst-card-${m}')?.scrollIntoView({behavior: 'smooth', block: 'nearest'}), 50)" class="p-4 rounded-xl border-2 transition-all active:scale-[0.98] cursor-pointer text-left ${state.cardInstallment === m ? 'border-fintech-royal bg-blue-50 shadow-sm' : 'border-slate-100 bg-white hover:border-slate-200'}">
                                                     <div class="flex justify-between items-center mb-1">
                                                         <span class="font-extrabold text-lg text-slate-700">${m}x de ${formatBRL(instValue)}</span>
                                                         <span class="text-[10px] font-bold text-slate-400 uppercase">${formatBRL(total)}</span>
@@ -940,7 +1200,30 @@
                 `;
             }
 
+            // Save scroll positions of specific containers to restore them after re-render
+            const scrollPositions = {};
+            const containersToPreserve = ['installment-list-loan', 'installment-list-card'];
+            containersToPreserve.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) scrollPositions[id] = el.scrollTop;
+            });
+
             container.innerHTML = content;
+
+            // Trigger loan entry animation if needed
+            if (state.step === 'amount' && !state.loanEntryAnimated) {
+                state.loanEntryAnimated = true;
+                setTimeout(triggerLoanEntryAnimation, 300);
+            }
+
+            // Restore scroll positions
+            containersToPreserve.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && scrollPositions[id] !== undefined) {
+                    el.scrollTop = scrollPositions[id];
+                }
+            });
+
             lucide.createIcons(); // Re-initialize icons
         };
 
