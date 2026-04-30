@@ -348,7 +348,7 @@
                 <i data-lucide="chevron-left"></i>
             </button>
             <div id="header-spacer-left" class="w-8"></div>
-            <h1 onclick="setState({step: 'hub'})" class="font-extrabold text-3xl md:text-4xl tracking-tight text-white leading-none cursor-pointer active:scale-95 transition-transform">VTMcred</h1>
+            <h1 onclick="setState({step: 'hub'})" class="font-extrabold text-3xl md:text-4xl tracking-tight text-white leading-none cursor-pointer active:scale-95 transition-transform">VTMCred.</h1>
             <div id="header-spacer-right" class="w-8"></div>
         </div>
         <div class="flex justify-center" id="header-subtitle-container">
@@ -449,11 +449,11 @@
         };
 
         const SLOGAN_PHRASES = [
-            "Compromisso claro, Crédito direto.",
-            "Simples, rápido e sem burocracia.",
-            "Seu limite pode virar dinheiro.",
-            "Simule e resolva agora.",
-            "Transparência em cada parcela."
+            "Compromisso claro, Crédito direto",
+            "Simples, rápido e sem burocracia",
+            "Seu limite pode virar dinheiro",
+            "Simule e resolva agora",
+            "Transparência em cada parcela"
         ];
 
         // --- Scramble Effect Logic ---
@@ -603,16 +603,16 @@
                 
                 // Trigger Loading logic
                 if (state.step === 'loading') {
-                    state.loadingMessage = "Analisando sua simulação...";
+                    state.loadingMessage = "Analisando sua simulação";
                     render(); // Initial render for first message
 
                     setTimeout(() => {
-                        state.loadingMessage = "Calculando as melhores condições...";
+                        state.loadingMessage = "Calculando as melhores condições";
                         render();
                     }, 1500);
 
                     setTimeout(() => {
-                        state.loadingMessage = "Quase pronto...";
+                        state.loadingMessage = "Quase pronto";
                         render();
                     }, 3500);
 
@@ -874,7 +874,7 @@
                         <div class="flex flex-col items-center justify-center gap-8 w-full max-w-[340px] animate-in fade-in zoom-in duration-300">
                             <div class="spinner-modern"></div>
                             <div class="text-center space-y-3">
-                                <h2 class="text-xl font-black text-slate-800 transition-all duration-300">${state.loadingMessage || 'Analisando sua simulação...'}</h2>
+                                <h2 class="text-xl font-black text-slate-800 transition-all duration-300">${state.loadingMessage || 'Analisando sua simulação'}</h2>
                                 <p class="text-sm text-slate-400 font-medium tracking-tight">Aguarde alguns instantes</p>
                             </div>
                         </div>
@@ -1171,8 +1171,10 @@
 
             const baseRate = getProgressiveRate(state.amount);
             let currentRate = baseRate;
+            let hasDiscount = false;
             
             if (state.credKey.toUpperCase() === DISCOUNT_KEY) {
+                hasDiscount = true;
                 if (baseRate === 0.30) currentRate = 0.22;
                 else if (baseRate === 0.20) currentRate = 0.15;
                 else if (baseRate === 0.15) currentRate = 0.10;
@@ -1182,7 +1184,8 @@
             const total = Math.round(state.amount * (1 + currentRate * months));
             const inst = Math.round(total / months);
             
-            const msg = `Fiz uma simulação no *VTMCred*.\n\nResumo da simulação:\n\n* Valor: *${formatBRL(state.amount)}*\n* Parcelamento: *${months}x* de *${formatBRL(inst)}*\n* Total: *${formatBRL(total)}*\n\nGostaria de seguir com a contratação.`;
+            const discountLine = hasDiscount ? `\n\n*CredKey Aplicada*` : '';
+            const msg = `Fiz uma simulação no *VTMCred*.\n\nResumo da simulação:\n\n* Valor: *${formatBRL(state.amount)}*\n* Parcelamento: *${months}x* de *${formatBRL(inst)}*\n* Total: *${formatBRL(total)}*${discountLine}\n\nGostaria de seguir com a contratação.`;
             window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
