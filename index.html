@@ -338,6 +338,98 @@
             color: #94a3b8;
             font-weight: 500;
         }
+
+        /* Policy Modal Styles */
+        #policy-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #F8F9FA;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        #policy-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .policy-card {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .policy-progress-bar {
+            height: 4px;
+            background: #E2E8F0;
+            border-radius: 2px;
+            width: 100%;
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .policy-progress-fill {
+            height: 100%;
+            background: #002BFF;
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .policy-checkbox {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #CBD5E1;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            shrink: 0;
+        }
+
+        .policy-checkbox:checked {
+            background-color: #002BFF;
+            border-color: #002BFF;
+        }
+
+        .policy-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            font-weight: bolder;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .policy-input {
+            width: 100%;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 14px;
+            color: #1E293B;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .policy-input:focus {
+            border-color: #002BFF;
+            box-shadow: 0 0 0 3px rgba(0, 43, 255, 0.1);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -398,6 +490,9 @@
             </div>
         </div>
     </div>
+    
+    <!-- Policy Modal -->
+    <div id="policy-modal-overlay"></div>
 
     <script>
         // --- Configuration & Constants ---
@@ -582,8 +677,80 @@
             cardInstallment: null,
             activeSimulator: 'loan', // 'loan' or 'card'
             showCredKeyInput: false,
-            _lastShowCredKeyInput: false
+            _lastShowCredKeyInput: false,
+            // Policy Flow
+            showPolicy: false,
+            policyStep: 0,
+            policyAccepted: [false, false, false, false, false, false],
+            policyForm: { name: '', cpf: '', phone: '', email: '' },
+            policyFinalizing: false
         };
+
+        const POLICY_STEPS = [
+            {
+                title: "CÓDIGO VTMCRED",
+                text: `<p class="mb-4">Nesta operação, compromisso vem antes do valor.</p>
+                       <p class="mb-4">Cada etapa deste processo existe para garantir clareza entre as partes.</p>
+                       <p class="mb-4">Aqui, palavra tem peso.<br>Prazo tem importância.<br>E compromisso define continuidade.</p>
+                       <p>Leia cada etapa com atenção antes de avançar.</p>`,
+                footer: "",
+                checkbox: "Li e compreendi."
+            },
+            {
+                title: "ANÁLISE DA OPERAÇÃO",
+                text: `<ul class="space-y-3">
+                        <li class="flex gap-2"><span>•</span> <span>Atendimento destinado a clientes CLT</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>O contracheque será utilizado para análise de perfil</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Após a análise, será enviada a simulação disponível</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Taxa mensal a partir de 15%</span></li>
+                       </ul>`,
+                footer: "A continuidade da operação depende da veracidade das informações enviadas.",
+                checkbox: "Concordo com as condições de análise."
+            },
+            {
+                title: "CONDIÇÕES DA OPERAÇÃO",
+                text: `<ul class="space-y-3">
+                        <li class="flex gap-2"><span>•</span> <span>Parcelas com vencimento a cada 30 dias</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Alterações de data podem gerar ajuste no valor</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Antecipações não geram desconto</span></li>
+                       </ul>`,
+                footer: "O acordo firmado define o relacionamento entre as partes.",
+                checkbox: "Li e concordo com as condições."
+            },
+            {
+                title: "RESPONSABILIDADE SOBRE PRAZOS",
+                text: `<ul class="space-y-3">
+                        <li class="flex gap-2"><span>•</span> <span>Multa diária de R$15,00 em caso de atraso</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Após 20 dias, poderá ocorrer vencimento antecipado da operação</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>O débito poderá ser exigido integralmente</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Medidas cabíveis poderão ser adotadas para recuperação do crédito</span></li>
+                       </ul>`,
+                footer: "Compromissos cumpridos mantêm o relacionamento ativo.",
+                checkbox: "Estou ciente das condições em caso de atraso."
+            },
+            {
+                title: "DOCUMENTAÇÃO NECESSÁRIA",
+                text: `<ul class="space-y-3">
+                        <li class="flex gap-2"><span>•</span> <span>RG ou CNH</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Comprovante de residência atualizado</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Foto da frente da residência</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Endereço da empresa onde trabalha</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>E-mail para assinatura</span></li>
+                       </ul>`,
+                footer: "As informações serão utilizadas exclusivamente para formalização da operação.",
+                checkbox: "Confirmo que poderei enviar a documentação."
+            },
+            {
+                title: "FORMALIZAÇÃO FINAL",
+                text: `<ul class="space-y-3">
+                        <li class="flex gap-2"><span>•</span> <span>Assinatura digital da nota/promissória</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Conferência final dos dados enviados</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Validação da operação</span></li>
+                       </ul>`,
+                footer: "A assinatura representa ciência e concordância com todas as etapas anteriores.",
+                checkbox: "Concordo com a formalização."
+            }
+        ];
 
         const setState = (updates) => {
             const oldStep = state.step;
@@ -769,7 +936,10 @@
                                 <i data-lucide="lock" class="text-slate-300 lucide-small"></i>
                             </div>
                         </div>
-                        <div class="animate-fade-up delay-400 text-center mt-4">
+                        <div class="animate-fade-up delay-400 text-center mt-4 flex flex-col items-center gap-5">
+                            <button onclick="setState({showPolicy: true, policyStep: 0})" class="text-fintech-royal text-[10px] font-bold uppercase tracking-widest hover:opacity-80 transition-opacity active:scale-95">
+                                Política de Relacionamento Financeiro
+                            </button>
                             <a href="https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent('Olá! Vim pelo site da VTMCred e gostaria de mais informações.')}" target="_blank" class="text-slate-400 hover:text-[#25D366] text-xs font-medium transition-colors inline-block active:scale-95">
                                 Precisa de ajuda? <span class="underline">Fale comigo no WhatsApp</span>
                             </a>
@@ -1156,6 +1326,112 @@
             });
 
             lucide.createIcons(); // Re-initialize icons
+            renderPolicy();
+        };
+
+        const renderPolicy = () => {
+            const overlay = document.getElementById('policy-modal-overlay');
+            if (state.showPolicy) {
+                overlay.classList.add('active');
+                
+                const totalSteps = POLICY_STEPS.length + 1; // +1 for final form
+                const progress = ((state.policyStep + 1) / totalSteps) * 100;
+                
+                let stepContent = '';
+                
+                if (state.policyStep < POLICY_STEPS.length) {
+                    const step = POLICY_STEPS[state.policyStep];
+                    stepContent = `
+                        <div class="flex-1 flex flex-col pt-10">
+                            <div class="mb-10">
+                                <h2 class="text-2xl font-black text-slate-800 tracking-tight mb-2">${step.title}</h2>
+                                <div class="policy-progress-bar mt-6">
+                                    <div class="policy-progress-fill" style="width: ${progress}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 text-slate-600 font-medium leading-relaxed mb-8">
+                                ${step.text}
+                                ${step.footer ? `<p class="mt-8 pt-6 border-t border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-widest">${step.footer}</p>` : ''}
+                            </div>
+                            
+                            <div class="mt-auto space-y-6">
+                                <label class="flex items-center gap-4 cursor-pointer group">
+                                    <input type="checkbox" ${state.policyAccepted[state.policyStep] ? 'checked' : ''} onchange="state.policyAccepted[${state.policyStep}] = this.checked; renderPolicy()" class="policy-checkbox">
+                                    <span class="text-sm font-bold text-slate-800 group-hover:text-fintech-royal transition-colors">${step.checkbox}</span>
+                                </label>
+                                
+                                <button onclick="setState({policyStep: state.policyStep + 1})" ${!state.policyAccepted[state.policyStep] ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-200 active:scale-95 disabled:opacity-30">
+                                    CONTINUAR <i data-lucide="chevron-right" class="lucide-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Final confirmation form
+                    stepContent = `
+                        <div class="flex-1 flex flex-col pt-10">
+                            <div class="mb-10">
+                                <h2 class="text-2xl font-black text-slate-800 tracking-tight mb-2">CONFIRMAÇÃO FINAL</h2>
+                                <div class="policy-progress-bar mt-6">
+                                    <div class="policy-progress-fill" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 mb-8">
+                                <p class="text-slate-600 font-medium leading-relaxed mb-8">
+                                    Ao concluir esta etapa, você confirma que:
+                                </p>
+                                <ul class="space-y-3 text-slate-800 font-bold mb-10">
+                                    <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5"></i> Leu todas as condições</li>
+                                    <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5"></i> Entendeu as regras da operação</li>
+                                    <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5"></i> Concorda com os termos apresentados</li>
+                                    <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5"></i> Assume responsabilidade pelos compromissos firmados</li>
+                                </ul>
+                                
+                                <div class="space-y-4">
+                                    <input type="text" placeholder="Nome Completo" value="${state.policyForm.name}" oninput="state.policyForm.name = this.value; renderPolicy()" class="policy-input">
+                                    <input type="text" placeholder="CPF" value="${state.policyForm.cpf}" oninput="state.policyForm.cpf = this.value; renderPolicy()" class="policy-input">
+                                    <input type="tel" placeholder="Telefone" value="${state.policyForm.phone}" oninput="state.policyForm.phone = this.value; renderPolicy()" class="policy-input">
+                                    <input type="email" placeholder="E-mail" value="${state.policyForm.email}" oninput="state.policyForm.email = this.value; renderPolicy()" class="policy-input">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <button onclick="handlePolicySubmit()" ${state.policyFinalizing || !state.policyForm.name || !state.policyForm.cpf || !state.policyForm.phone || !state.policyForm.email ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-200 active:scale-95 disabled:opacity-30">
+                                    ${state.policyFinalizing ? '<div class="spinner-modern !w-5 !h-5 !border-2"></div> PROCESSANDO...' : 'ENVIAR PARA O CREDOR'}
+                                </button>
+                                
+                                ${state.policyFinalizing ? `
+                                    <p class="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-4 animate-pulse">
+                                        Seu registro foi preparado.<br>Finalize o envio pelo WhatsApp.
+                                    </p>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                overlay.innerHTML = `
+                    <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-white">
+                        <button onclick="if(state.policyStep > 0) { setState({policyStep: state.policyStep - 1}); } else { setState({showPolicy: false}); }" class="p-2 text-slate-400">
+                            <i data-lucide="arrow-left"></i>
+                        </button>
+                        <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">POLÍTICA VTMCRED</span>
+                        <button onclick="setState({showPolicy: false})" class="p-2 text-slate-400">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                    <div class="policy-card animate-in fade-in duration-500">
+                        ${stepContent}
+                    </div>
+                `;
+                
+                lucide.createIcons();
+            } else {
+                overlay.classList.remove('active');
+                overlay.innerHTML = '';
+            }
         };
 
         // --- Event Handlers ---
@@ -1205,6 +1481,39 @@
                 msg = `Fiz uma simulação para Cartão no *VTMCred*.\n\nResumo da simulação:\n\n* Valor utilizado: *${valUsed}*\n* Método: *${state.cardMethod}*\n* Bandeira: *${state.cardBrand}*\n* Banco: *${state.cardBank}*\n\nGostaria de seguir com a contratação.`;
             }
             window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+        };
+
+        const handlePolicySubmit = () => {
+            const { name, cpf, phone, email } = state.policyForm;
+            if (!name || !cpf || !phone || !email) {
+                alert("Por favor, preencha todos os campos obrigatórios.");
+                return;
+            }
+
+            setState({ policyFinalizing: true });
+
+            const now = new Date();
+            const dateStr = now.toLocaleString('pt-BR');
+
+            const msg = `CÓDIGO VTMCRED — ACEITAÇÃO DE TERMOS\n\n` +
+                        `Nome: ${name}\n` +
+                        `CPF: ${cpf}\n` +
+                        `Telefone: ${phone}\n` +
+                        `E-mail: ${email}\n\n` +
+                        `O cliente confirma que leu e concordou com:\n\n` +
+                        `✔️ Introdução e Código VTMCred\n` +
+                        `✔️ Condições de análise\n` +
+                        `✔️ Condições da operação\n` +
+                        `✔️ Responsabilidade sobre prazos\n` +
+                        `✔️ Documentação necessária\n` +
+                        `✔️ Formalização final\n\n` +
+                        `Data/Hora: ${dateStr}\n\n` +
+                        `Confirmação final realizada com sucesso.`;
+
+            setTimeout(() => {
+                window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+                setState({ showPolicy: false, policyFinalizing: false, policyStep: 0, policyAccepted: [false, false, false, false, false, false], policyForm: { name: '', cpf: '', phone: '', email: '' } });
+            }, 1000);
         };
 
         // --- Initial Render ---
