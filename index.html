@@ -1434,14 +1434,14 @@
                             </div>
                         </div>
                     `;
-                } else {
+                } else if (state.policyStep === POLICY_STEPS.length) {
                     // Final confirmation form
                     stepContent = `
                         <div class="flex-1 flex flex-col pt-10">
                             <div class="mb-10">
                                 <h2 class="text-2xl font-black text-slate-800 tracking-tight mb-2">CONFIRMAÇÃO FINAL</h2>
                                 <div class="policy-progress-bar mt-6">
-                                    <div class="policy-progress-fill" style="width: 100%"></div>
+                                    <div class="policy-progress-fill" style="width: ${progress}%"></div>
                                 </div>
                             </div>
                             
@@ -1477,11 +1477,30 @@
                             </div>
                         </div>
                     `;
+                } else {
+                    // Success Screen
+                    stepContent = `
+                        <div class="flex-1 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-500">
+                            <div class="w-20 h-20 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-8">
+                                <i data-lucide="check" class="w-10 h-10"></i>
+                            </div>
+                            <h2 class="text-2xl font-black text-slate-800 tracking-tight mb-4">Registro enviado<br>com sucesso.</h2>
+                            <p class="text-slate-500 font-medium leading-relaxed max-w-[280px]">
+                                O compromisso começa antes da assinatura.
+                            </p>
+                            
+                            <button onclick="setState({showPolicy: false, policyStep: 0, policyAccepted: [false, false, false, false, false, false], policyForm: { name: '', cpf: '', phone: '', email: '' }})" class="mt-12 w-full max-w-[200px] border-2 border-slate-200 text-slate-400 py-3 rounded-xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">
+                                FECHAR
+                            </button>
+                        </div>
+                    `;
                 }
+
+                const isSuccessScreen = state.policyStep > POLICY_STEPS.length;
 
                 overlay.innerHTML = `
                     <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-white">
-                        <button onclick="if(state.policyStep > 0) { setState({policyStep: state.policyStep - 1}); } else { setState({showPolicy: false}); }" class="p-2 text-slate-400">
+                        <button onclick="if(state.policyStep > 0) { setState({policyStep: state.policyStep - 1}); } else { setState({showPolicy: false}); }" class="p-2 text-slate-400 ${isSuccessScreen ? 'invisible' : ''}">
                             <i data-lucide="arrow-left"></i>
                         </button>
                         <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest titulo-politica">Código VTMCred.</span>
@@ -1562,24 +1581,32 @@
             const now = new Date();
             const dateStr = now.toLocaleString('pt-BR');
 
-            const msg = `Código VTMCred. — ACEITAÇÃO DE TERMOS\n\n` +
+            const msg = `*CÓDIGO VTMCRED — ACEITAÇÃO DE TERMOS*\n\n` +
+                        `Eu, *${name.toUpperCase()}*, portador do CPF *${cpf}*, declaro que li as políticas de relacionamento financeiro do VTMCred e aceito integralmente os termos conforme detalhado abaixo:\n\n` +
+                        
+                        `*1. SOBRE O COMPROMISSO:* Eu vi e entendi que nesta operação o compromisso vem antes do valor. Compreendo que cada etapa deste processo garante clareza entre as partes e aceito que minha palavra tem peso, meus prazos têm importância e meu compromisso define a continuidade do relacionamento. *ACEITO OS TERMOS E COMPROMISSOS.*\n\n` +
+                        
+                        `*2. ANÁLISE DA OPERAÇÃO:* Estou ciente de que o atendimento é destinado a clientes CLT e que meu contracheque será utilizado para análise de perfil. Aceito que a taxa mensal é a partir de 15% e entendo que a continuidade da operação depende da total veracidade das informações que enviei. *ACEITO E CONCORDO COM AS CONDIÇÕES DE ANÁLISE.*\n\n` +
+                        
+                        `*3. CONDIÇÕES DA OPERAÇÃO:* Eu concordo que as parcelas terão vencimento a cada 30 dias. Entendo que alterações de data podem gerar ajuste no valor e estou ciente de que antecipações não geram desconto. *ACEITO AS CONDIÇÕES DA OPERAÇÃO.*\n\n` +
+                        
+                        `*4. RESPONSABILIDADE SOBRE PRAZOS:* Eu assumo a responsabilidade sobre os prazos e estou totalmente ciente da multa diária de R$ 15,00 em caso de atraso. Entendo que após 20 dias poderá ocorrer o vencimento antecipado da operação, podendo o débito ser exigido integralmente com as medidas cabíveis para recuperação do crédito. *ESTOU CIENTE E ACEITO AS RESPONSABILIDADES SOBRE ATRASOS.*\n\n` +
+                        
+                        `*5. DOCUMENTAÇÃO NECESSÁRIA:* Confirmo que possuo e enviarei RG ou CNH, comprovante de residência atualizado, foto da residência, endereço profissional e e-mail para formalização. *ACEITO E CONFIRMO O ENVIO DA DOCUMENTAÇÃO.*\n\n` +
+                        
+                        `*6. FORMALIZAÇÃO:* Eu concordo com a formalização final através de assinatura digital da nota/promissória e validação dos dados. *CONCORDO COM A FORMALIZAÇÃO FINAL.*\n\n` +
+                        
+                        `*MEUS DADOS:*\n` +
                         `Nome: ${name}\n` +
                         `CPF: ${cpf}\n` +
                         `Telefone: ${phone}\n` +
                         `E-mail: ${email}\n\n` +
-                        `O cliente confirma que leu e concordou com:\n\n` +
-                        `✔️ Introdução e Política de Relacionamento Financeiro\n` +
-                        `✔️ Condições de análise\n` +
-                        `✔️ Condições da operação\n` +
-                        `✔️ Responsabilidade sobre prazos\n` +
-                        `✔️ Documentação necessária\n` +
-                        `✔️ Formalização final\n\n` +
-                        `Data/Hora: ${dateStr}\n\n` +
-                        `Confirmação final realizada com sucesso.`;
+                        `*Data/Hora do Aceite:* ${dateStr}\n\n` +
+                        `_Registro individual de aceitação realizado via plataforma VTMCred._`;
 
             setTimeout(() => {
                 window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-                setState({ showPolicy: false, policyFinalizing: false, policyStep: 0, policyAccepted: [false, false, false, false, false, false], policyForm: { name: '', cpf: '', phone: '', email: '' } });
+                setState({ policyStep: POLICY_STEPS.length + 1, policyFinalizing: false });
             }, 1000);
         };
 
