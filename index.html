@@ -430,6 +430,18 @@
             border-color: #002BFF;
             box-shadow: 0 0 0 3px rgba(0, 43, 255, 0.1);
         }
+
+        /* Mobile Fixes */
+        @media screen and (max-width: 768px) {
+            .policy-input {
+                font-size: 16px !important; /* Prevents auto-zoom on iOS */
+            }
+        }
+        
+        .erro-input {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -688,7 +700,7 @@
 
         const POLICY_STEPS = [
             {
-                title: "CÓDIGO VTMCRED",
+                title: "POLÍTICA DE RELACIONAMENTO FINANCEIRO",
                 text: `<p class="mb-4">Nesta operação, compromisso vem antes do valor.</p>
                        <p class="mb-4">Cada etapa deste processo existe para garantir clareza entre as partes.</p>
                        <p class="mb-4">Aqui, palavra tem peso.<br>Prazo tem importância.<br>E compromisso define continuidade.</p>
@@ -817,6 +829,61 @@
 
         // --- Logic Helper ---
         const formatBRL = (val) => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }).replace('R$', 'R$ ');
+
+        // --- Policy Helpers ---
+        const maskCPF = (val) => {
+            let value = val.replace(/\D/g, "");
+            value = value.substring(0, 11);
+            value = value.replace(/(\d{3})(\d)/, "$1.$2");
+            value = value.replace(/(\d{3})(\d)/, "$1.$2");
+            value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            return value;
+        };
+
+        const maskPhone = (val) => {
+            let value = val.replace(/\D/g, "");
+            value = value.substring(0, 11);
+            value = value.replace(/^(\d{2})(\d)/g, "($1) $2");
+            value = value.replace(/(\d{5})(\d)/, "$1-$2");
+            return value;
+        };
+
+        const validateEmail = (email) => {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        };
+
+        const updatePolicyForm = () => {
+            const { name, cpf, phone, email } = state.policyForm;
+            const btn = document.getElementById('policy-final-submit-btn');
+            if (btn) {
+                const isValid = name.trim().length > 3 && 
+                                cpf.length === 14 && 
+                                phone.length >= 14 && 
+                                validateEmail(email);
+                btn.disabled = state.policyFinalizing || !isValid;
+            }
+        };
+
+        const handlePolicyInput = (field, el) => {
+            let val = el.value;
+            if (field === 'name') {
+                val = val.replace(/[^A-Za-zÀ-ÿ\s]/g, "");
+            } else if (field === 'cpf') {
+                val = maskCPF(val);
+            } else if (field === 'phone') {
+                val = maskPhone(val);
+            }
+            
+            el.value = val;
+            state.policyForm[field] = val;
+            
+            if (field === 'email') {
+                if (validateEmail(val)) el.classList.remove('erro-input');
+                else if (val.length > 0) el.classList.add('erro-input');
+            }
+            
+            updatePolicyForm();
+        };
 
         const handleCredKeyInput = (val) => {
             state.credKey = val;
@@ -1390,15 +1457,15 @@
                                 </ul>
                                 
                                 <div class="space-y-4">
-                                    <input type="text" placeholder="Nome Completo" value="${state.policyForm.name}" oninput="state.policyForm.name = this.value; renderPolicy()" class="policy-input">
-                                    <input type="text" placeholder="CPF" value="${state.policyForm.cpf}" oninput="state.policyForm.cpf = this.value; renderPolicy()" class="policy-input">
-                                    <input type="tel" placeholder="Telefone" value="${state.policyForm.phone}" oninput="state.policyForm.phone = this.value; renderPolicy()" class="policy-input">
-                                    <input type="email" placeholder="E-mail" value="${state.policyForm.email}" oninput="state.policyForm.email = this.value; renderPolicy()" class="policy-input">
+                                    <input id="policy-name" type="text" placeholder="Nome Completo" value="${state.policyForm.name}" oninput="handlePolicyInput('name', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                    <input id="policy-cpf" type="text" placeholder="CPF" value="${state.policyForm.cpf}" oninput="handlePolicyInput('cpf', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                    <input id="policy-phone" type="tel" placeholder="Telefone" value="${state.policyForm.phone}" oninput="handlePolicyInput('phone', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                    <input id="policy-email" type="email" placeholder="E-mail" value="${state.policyForm.email}" oninput="handlePolicyInput('email', this)" onblur="if(!validateEmail(this.value)) this.classList.add('erro-input'); else this.classList.remove('erro-input')" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
                                 </div>
                             </div>
                             
                             <div class="mt-auto">
-                                <button onclick="handlePolicySubmit()" ${state.policyFinalizing || !state.policyForm.name || !state.policyForm.cpf || !state.policyForm.phone || !state.policyForm.email ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-200 active:scale-95 disabled:opacity-30">
+                                <button id="policy-final-submit-btn" onclick="handlePolicySubmit()" ${state.policyFinalizing || !state.policyForm.name || !state.policyForm.cpf || !state.policyForm.phone || !state.policyForm.email || !validateEmail(state.policyForm.email) ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-200 active:scale-95 disabled:opacity-30">
                                     ${state.policyFinalizing ? '<div class="spinner-modern !w-5 !h-5 !border-2"></div> PROCESSANDO...' : 'ENVIAR PARA O CREDOR'}
                                 </button>
                                 
@@ -1417,7 +1484,7 @@
                         <button onclick="if(state.policyStep > 0) { setState({policyStep: state.policyStep - 1}); } else { setState({showPolicy: false}); }" class="p-2 text-slate-400">
                             <i data-lucide="arrow-left"></i>
                         </button>
-                        <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">POLÍTICA VTMCRED</span>
+                        <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest titulo-politica">Código VTMCred.</span>
                         <button onclick="setState({showPolicy: false})" class="p-2 text-slate-400">
                             <i data-lucide="x"></i>
                         </button>
@@ -1495,13 +1562,13 @@
             const now = new Date();
             const dateStr = now.toLocaleString('pt-BR');
 
-            const msg = `CÓDIGO VTMCRED — ACEITAÇÃO DE TERMOS\n\n` +
+            const msg = `Código VTMCred. — ACEITAÇÃO DE TERMOS\n\n` +
                         `Nome: ${name}\n` +
                         `CPF: ${cpf}\n` +
                         `Telefone: ${phone}\n` +
                         `E-mail: ${email}\n\n` +
                         `O cliente confirma que leu e concordou com:\n\n` +
-                        `✔️ Introdução e Código VTMCred\n` +
+                        `✔️ Introdução e Política de Relacionamento Financeiro\n` +
                         `✔️ Condições de análise\n` +
                         `✔️ Condições da operação\n` +
                         `✔️ Responsabilidade sobre prazos\n` +
