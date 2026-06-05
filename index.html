@@ -703,7 +703,7 @@
                 title: "POLÍTICA DE RELACIONAMENTO FINANCEIRO",
                 text: `<p class="mb-4">Nesta operação, compromisso vem antes do valor.</p>
                        <p class="mb-4">Cada etapa deste processo existe para garantir clareza entre as partes.</p>
-                       <p class="mb-4">Aqui, palavra tem peso.<br>Prazo tem importância.<br>E compromisso define continuidade.</p>
+                       <p class="mb-4">Aqui, palavra tem peso.<br>Prazo tem importância.</p>
                        <p>Leia cada etapa com atenção antes de avançar.</p>`,
                 footer: "",
                 checkbox: "Li e compreendi."
@@ -713,8 +713,8 @@
                 text: `<ul class="space-y-3">
                         <li class="flex gap-2"><span>•</span> <span>Atendimento destinado a clientes CLT</span></li>
                         <li class="flex gap-2"><span>•</span> <span>O contracheque será utilizado para análise de perfil</span></li>
-                        <li class="flex gap-2"><span>•</span> <span>Após a análise, será enviada a simulação disponível</span></li>
-                        <li class="flex gap-2"><span>•</span> <span>Taxa mensal a partir de 15%</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Após a análise, será enviado o valor disponivel</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Taxa mensal fixa a depender do valor</span></li>
                        </ul>`,
                 footer: "A continuidade da operação depende da veracidade das informações enviadas.",
                 checkbox: "Concordo com as condições de análise."
@@ -735,7 +735,7 @@
                         <li class="flex gap-2"><span>•</span> <span>Multa diária de R$15,00 em caso de atraso</span></li>
                         <li class="flex gap-2"><span>•</span> <span>Após 20 dias, poderá ocorrer vencimento antecipado da operação</span></li>
                         <li class="flex gap-2"><span>•</span> <span>O débito poderá ser exigido integralmente</span></li>
-                        <li class="flex gap-2"><span>•</span> <span>Medidas cabíveis poderão ser adotadas para recuperação do crédito</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Medidas serão adotadas para recuperação do crédito</span></li>
                        </ul>`,
                 footer: "Compromissos cumpridos mantêm o relacionamento ativo.",
                 checkbox: "Estou ciente das condições em caso de atraso."
@@ -744,8 +744,13 @@
                 title: "DOCUMENTAÇÃO NECESSÁRIA",
                 text: `<ul class="space-y-3">
                         <li class="flex gap-2"><span>•</span> <span>RG ou CNH</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Foto segurando RG ou CNH ao lado do rosto</span></li>
                         <li class="flex gap-2"><span>•</span> <span>Comprovante de residência atualizado</span></li>
-                        <li class="flex gap-2"><span>•</span> <span>Foto da frente da residência</span></li>
+                        <li class="flex flex-col pl-4 text-xs text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                            <span class="font-bold mb-1">• Se não estiver no seu nome, enviar:</span>
+                            <span class="pl-2">- Foto da frente da residência</span>
+                            <span class="pl-2">- Foto sua na frente da residência</span>
+                        </li>
                         <li class="flex gap-2"><span>•</span> <span>Endereço da empresa onde trabalha</span></li>
                         <li class="flex gap-2"><span>•</span> <span>E-mail para assinatura</span></li>
                        </ul>`,
@@ -1575,15 +1580,15 @@
             const msg = `*CÓDIGO VTMCRED — ACEITAÇÃO DE TERMOS*\n\n` +
                         `Eu, *${name.toUpperCase()}*, portador do CPF *${cpf}*, declaro que li as políticas de relacionamento financeiro do VTMCred e aceito integralmente os termos conforme detalhado abaixo:\n\n` +
                         
-                        `*1. SOBRE O COMPROMISSO:* Eu vi e entendi que nesta operação o compromisso vem antes do valor. Compreendo que cada etapa deste processo garante clareza entre as partes e aceito que minha palavra tem peso, meus prazos têm importância e meu compromisso define a continuidade do relacionamento. *ACEITO OS TERMOS E COMPROMISSOS.*\n\n` +
+                        `*1. SOBRE O COMPROMISSO:* Eu vi e entendi que nesta operação o compromisso vem antes do valor. Compreendo que cada etapa deste processo garante clareza entre as partes e aceito que minha palavra tem peso e meus prazos têm importância. *ACEITO OS TERMOS E COMPROMISSOS.*\n\n` +
                         
-                        `*2. ANÁLISE DA OPERAÇÃO:* Estou ciente de que o atendimento é destinado a clientes CLT e que meu contracheque será utilizado para análise de perfil. Aceito que a taxa mensal é a partir de 15% e entendo que a continuidade da operação depende da total veracidade das informações que enviei. *ACEITO E CONCORDO COM AS CONDIÇÕES DE ANÁLISE.*\n\n` +
+                        `*2. ANÁLISE DA OPERAÇÃO:* Estou ciente de que o atendimento é destinado a clientes CLT e que meu contracheque será utilizado para análise de perfil. Compreendo que após a análise, será enviado o valor disponível. Aceito que a taxa mensal é fixa a depender do valor e entendo que a continuidade da operação depende da total veracidade das informações que enviei. *ACEITO E CONCORDO COM AS CONDIÇÕES DE ANÁLISE.*\n\n` +
                         
                         `*3. CONDIÇÕES DA OPERAÇÃO:* Eu concordo que as parcelas terão vencimento a cada 30 dias. Entendo que alterações de data podem gerar ajuste no valor e estou ciente de que antecipações não geram desconto. *ACEITO AS CONDIÇÕES DA OPERAÇÃO.*\n\n` +
                         
-                        `*4. RESPONSABILIDADE SOBRE PRAZOS:* Eu assumo a responsabilidade sobre os prazos e estou totalmente ciente da multa diária de R$ 15,00 em caso de atraso. Entendo que após 20 dias poderá ocorrer o vencimento antecipado da operação, podendo o débito ser exigido integralmente com as medidas cabíveis para recuperação do crédito. *ESTOU CIENTE E ACEITO AS RESPONSABILIDADES SOBRE ATRASOS.*\n\n` +
+                        `*4. RESPONSABILIDADE SOBRE PRAZOS:* Eu assumo a responsabilidade sobre os prazos e estou totalmente ciente da multa diária de R$ 15,00 em caso de atraso. Entendo que após 20 dias poderá ocorrer o vencimento antecipado da operação, podendo o débito ser exigido integralmente e medidas serão adotadas para recuperação do crédito. *ESTOU CIENTE E ACEITO AS RESPONSABILIDADES SOBRE ATRASOS.*\n\n` +
                         
-                        `*5. DOCUMENTAÇÃO NECESSÁRIA:* Confirmo que possuo e enviarei RG ou CNH, comprovante de residência atualizado, foto da residência, endereço profissional e e-mail para formalização. *ACEITO E CONFIRMO O ENVIO DA DOCUMENTAÇÃO.*\n\n` +
+                        `*5. DOCUMENTAÇÃO NECESSÁRIA:* Confirmo que possuo e enviarei RG ou CNH, foto segurando RG ou CNH ao lado do rosto, comprovante de residência atualizado (se não estiver no meu nome, enviarei foto da frente da residência e foto minha na frente da residência), endereço da empresa onde trabalho e e-mail para formalização. *ACEITO E CONFIRMO O ENVIO DA DOCUMENTAÇÃO COMPLETA.*\n\n` +
                         
                         `*6. FORMALIZAÇÃO:* Eu concordo com a formalização final através de assinatura digital da nota/promissória e validação dos dados. *CONCORDO COM A FORMALIZAÇÃO FINAL.*\n\n` +
                         
@@ -1595,10 +1600,9 @@
                         `*Data/Hora do Aceite:* ${dateStr}\n\n` +
                         `_Registro individual de aceitação realizado via plataforma VTMCred._`;
 
-            setTimeout(() => {
-                window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-                setState({ policyStep: POLICY_STEPS.length + 1, policyFinalizing: false });
-            }, 1000);
+            // Open window instantly on the user click thread to completely bypass browser popup blocking
+            window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+            setState({ policyStep: POLICY_STEPS.length + 1, policyFinalizing: false });
         };
 
         // --- Initial Render ---
