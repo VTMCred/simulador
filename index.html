@@ -509,6 +509,11 @@
     <script>
         // --- Configuration & Constants ---
         const DISCOUNT_KEY = "CLIENTEVTM5";
+        const isCredKeyActive = (key) => {
+            if (!key) return false;
+            const k = key.toUpperCase().trim();
+            return k === "CLIENTEVTM5" || k === "CREDITOQI";
+        };
         const PHONE_NUMBER = "5593996589790";
 
         // --- Help Popup Logic ---
@@ -839,18 +844,24 @@
         const getProgressiveRate = (val) => {
             if (!val || val <= 0) return 0.40;
             if (val <= 520) {
-                return 0.40 - ((val / 520) * 0.20);
+                return 0.40 - ((val / 520) * 0.18);
             }
             if (val <= 1020) {
-                return 0.20 - (((val - 520) / 500) * 0.05);
+                return 0.22 - (((val - 520) / 500) * 0.05);
+            }
+            if (val <= 1500) {
+                return 0.17 - (((val - 1020) / 480) * 0.02);
             }
             if (val <= 2000) {
-                return 0.15 - (((val - 1020) / 980) * 0.056);
+                return 0.15 - (((val - 1500) / 500) * 0.02);
             }
             if (val <= 2300) {
-                return 0.094 - (((val - 2000) / 300) * 0.009);
+                return 0.13 - (((val - 2000) / 300) * 0.01);
             }
-            return 0.085;
+            if (val <= 3000) {
+                return 0.12 - (((val - 2300) / 700) * 0.02);
+            }
+            return 0.10;
         };
 
         // --- Policy Helpers ---
@@ -910,7 +921,7 @@
 
         const handleCredKeyInput = (val) => {
             state.credKey = val;
-            const isKeyActive = state.credKey.toUpperCase() === DISCOUNT_KEY;
+            const isKeyActive = isCredKeyActive(state.credKey);
             const banner = document.getElementById('credkey-success-banner');
             if (banner) {
                 if (isKeyActive) banner.classList.remove('hidden');
@@ -955,7 +966,7 @@
                     const btn = document.getElementById('loan-btn-continue');
                     if(btn) btn.disabled = !state.amount || state.amount <= 0;
                     
-                    const isKeyActive = state.credKey.toUpperCase() === DISCOUNT_KEY;
+                    const isKeyActive = isCredKeyActive(state.credKey);
                     const banner = document.getElementById('credkey-success-banner');
                     if(banner) {
                         if(isKeyActive) banner.classList.remove('hidden');
@@ -963,7 +974,7 @@
                     }
                 }
                 if(state.step === 'key') {
-                    const isKeyActive = state.credKey.toUpperCase() === DISCOUNT_KEY;
+                    const isKeyActive = isCredKeyActive(state.credKey);
                     const banner = document.getElementById('credkey-success-banner');
                     if(banner) {
                         if(isKeyActive) banner.classList.remove('hidden');
@@ -1074,7 +1085,7 @@
                     </div>
                 `;
             } else if (state.step === 'amount') {
-                const isKeyActive = state.credKey.toUpperCase() === DISCOUNT_KEY;
+                const isKeyActive = isCredKeyActive(state.credKey);
 
                 content = `
                     <div class="flex-1 flex flex-col pt-4 step-transition">
@@ -1142,11 +1153,11 @@
                 `;
             } else if (state.step === 'results') {
                 let currentRate = getProgressiveRate(state.amount);
-                let economyPercent = 0;
+                let hasDiscount = false;
                 
-                if (state.credKey && (state.credKey === "CLIENTEVTM5" || state.credKey.toUpperCase().trim() === "CLIENTEVTM5")) {
-                    currentRate = currentRate * 0.85;
-                    economyPercent = 15;
+                if (isCredKeyActive(state.credKey)) {
+                    currentRate = Math.max(0, currentRate - 0.03);
+                    hasDiscount = true;
                 }
                 
                 const maxInst = state.amount < 200 ? 2 : (state.amount < 1000 ? 5 : 12);
@@ -1160,7 +1171,7 @@
 
                 content = `
                     <div class="flex-1 flex flex-col gap-4 step-transition pt-4">
-                        ${economyPercent > 0 ? `
+                        ${hasDiscount ? `
                             <div class="animate-in fade-in slide-in-from-top-2 duration-500 bg-fintech-royal/10 border border-fintech-royal/20 rounded-xl p-3 text-center">
                                 <p class="text-fintech-royal text-[13px] sm:text-sm font-black whitespace-nowrap">Você está usando sua CredKey</p>
                             </div>
@@ -1534,8 +1545,8 @@
             let currentRate = getProgressiveRate(state.amount);
             let hasDiscount = false;
             
-            if (state.credKey && (state.credKey === "CLIENTEVTM5" || state.credKey.toUpperCase().trim() === "CLIENTEVTM5")) {
-                currentRate = currentRate * 0.85;
+            if (isCredKeyActive(state.credKey)) {
+                currentRate = Math.max(0, currentRate - 0.03);
                 hasDiscount = true;
             }
             
