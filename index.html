@@ -512,7 +512,7 @@
         const isCredKeyActive = (key) => {
             if (!key) return false;
             const k = key.toUpperCase().trim();
-            return k === "CLIENTEVTM5" || k === "CREDITOQI";
+            return k === "CLIENTEVTM5";
         };
         const PHONE_NUMBER = "5593996589790";
 
@@ -855,13 +855,10 @@
             if (val <= 2000) {
                 return 0.15 - (((val - 1500) / 500) * 0.02);
             }
-            if (val <= 2300) {
-                return 0.13 - (((val - 2000) / 300) * 0.01);
+            if (val <= 2500) {
+                return 0.13 - (((val - 2000) / 500) * 0.01);
             }
-            if (val <= 3000) {
-                return 0.12 - (((val - 2300) / 700) * 0.02);
-            }
-            return 0.10;
+            return 0.12;
         };
 
         // --- Policy Helpers ---
@@ -920,13 +917,7 @@
         };
 
         const handleCredKeyInput = (val) => {
-            state.credKey = val;
-            const isKeyActive = isCredKeyActive(state.credKey);
-            const banner = document.getElementById('credkey-success-banner');
-            if (banner) {
-                if (isKeyActive) banner.classList.remove('hidden');
-                else banner.classList.add('hidden');
-            }
+            setState({ credKey: val });
         };
 
         // --- View Injection ---

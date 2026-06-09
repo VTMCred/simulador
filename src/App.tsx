@@ -69,9 +69,36 @@ export default function App() {
     12: 0.4500
   };
 
-  const DISCOUNT_KEY = "VTMCLIENTE4";
-  const baseRate = amount > 0 && amount < 1000 ? 0.20 : 0.15;
-  const currentRate = credKey.toUpperCase() === DISCOUNT_KEY ? baseRate - 0.04 : baseRate;
+  const DISCOUNT_KEY = "CLIENTEVTM5";
+
+  const getProgressiveRate = (val: number) => {
+    if (!val || val <= 0) return 0.40;
+    if (val <= 520) {
+      return 0.40 - ((val / 520) * 0.18);
+    }
+    if (val <= 1020) {
+      return 0.22 - (((val - 520) / 500) * 0.05);
+    }
+    if (val <= 1500) {
+      return 0.17 - (((val - 1020) / 480) * 0.02);
+    }
+    if (val <= 2000) {
+      return 0.15 - (((val - 1500) / 500) * 0.02);
+    }
+    if (val <= 2500) {
+      return 0.13 - (((val - 2000) / 500) * 0.01);
+    }
+    return 0.12;
+  };
+
+  const isCredKeyActive = (key: string) => {
+    if (!key) return false;
+    return key.toUpperCase().trim() === "CLIENTEVTM5";
+  };
+
+  const baseRate = getProgressiveRate(amount);
+  const hasDiscount = isCredKeyActive(credKey);
+  const currentRate = hasDiscount ? Math.max(0, baseRate - 0.03) : baseRate;
 
   const handleStart = () => setStep('amount');
   const handleAmountSubmit = () => {
@@ -79,7 +106,7 @@ export default function App() {
   };
   const handleKeySubmit = () => setStep('results');
   
-  const maxInstallments = amount < 1000 ? 5 : 12;
+  const maxInstallments = amount < 200 ? 2 : (amount < 1000 ? 5 : 12);
   
   const simulations = Array.from({ length: maxInstallments }, (_, i) => {
     const months = i + 1;
@@ -528,7 +555,7 @@ export default function App() {
                 
                 {credKey.toUpperCase() === DISCOUNT_KEY && (
                   <div className="mb-6 p-3 bg-green-50 text-green-700 rounded-md text-xs font-bold border border-green-100 flex items-center gap-2">
-                    <CheckCircle2 size={16} /> Key Ativada! Desconto Aplicado
+                    <CheckCircle2 size={16} /> Você está usando sua CredKey
                   </div>
                 )}
 
@@ -557,11 +584,16 @@ export default function App() {
               animate={{ opacity: 1 }}
               className="flex-1 flex flex-col gap-4"
             >
+              {hasDiscount && (
+                <div className="bg-[#3483FA]/10 border border-[#3483FA]/20 rounded-xl p-3 text-center mb-2">
+                  <p className="text-[#3483FA] text-sm font-bold">Você está usando sua CredKey</p>
+                </div>
+              )}
               <header className="px-1 flex justify-between items-center mb-2">
                 <h2 className="text-xl font-bold">Simulação</h2>
                 <div className="text-[#3483FA] flex items-center gap-1">
                   <Info size={16} />
-                  <span className="text-xs font-bold font-mono">{(currentRate * 100).toFixed(0)}% a.m.</span>
+                  <span className="text-xs font-bold font-mono">{(currentRate * 100).toFixed(1)}% a.m.</span>
                 </div>
               </header>
 
