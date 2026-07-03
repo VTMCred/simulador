@@ -186,7 +186,7 @@ export default function App() {
             >
               <div className="text-center mb-1">
                 <p className="text-slate-500 font-medium leading-tight">
-                  Simule agora e veja<br />suas opções em segundos.
+                  Simule agora e veja<br />suas opções em segundos
                 </p>
               </div>
 
