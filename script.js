@@ -189,7 +189,7 @@ let state = {
     // Policy Flow
     showPolicy: false,
     policyStep: 0,
-    policyAccepted: [false, false, false, false, false, false],
+    policyAccepted: [false, false, false, false, false, false, false],
     policyForm: { 
         name: '', cpf: '', phone: '', email: '',
         resRua: '', resBairro: '', resNumero: '', resCep: '',
@@ -916,8 +916,8 @@ const renderPolicy = () => {
     if (state.showPolicy) {
         overlay.classList.add('active');
         
-        const totalSteps = POLICY_STEPS.length + 1; // +1 for final form
-        const progress = ((state.policyStep + 1) / totalSteps) * 100;
+        const totalSteps = POLICY_STEPS.length + 2; // +2 for confirmation step & form step
+        const progress = Math.min(100, ((state.policyStep + 1) / totalSteps) * 100);
         
         let stepContent = '';
         
@@ -950,7 +950,7 @@ const renderPolicy = () => {
                 </div>
             `;
         } else if (state.policyStep === POLICY_STEPS.length) {
-            // Final confirmation form
+            // Confirmation Screen
             stepContent = `
                 <div class="flex-1 flex flex-col pt-10">
                     <div class="mb-10">
@@ -965,13 +965,42 @@ const renderPolicy = () => {
                             Ao concluir esta etapa, você confirma que:
                         </p>
                         <ul class="space-y-3 text-slate-800 font-bold mb-10">
-                            <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5"></i> Leu todas as condições</li>
-                            <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5"></i> Entendeu as regras da operation</li>
-                            <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5"></i> Concorda com os termos apresentados</li>
-                            <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5"></i> Assume responsabilidade pelos compromissos firmados</li>
+                            <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5 shrink-0"></i> Leu todas as condições</li>
+                            <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5 shrink-0"></i> Entendeu as regras da operação</li>
+                            <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5 shrink-0"></i> Concorda com os termos apresentados</li>
+                            <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5 shrink-0"></i> Assume responsabilidade pelos compromissos firmados</li>
                         </ul>
+                    </div>
+                    
+                    <div class="mt-auto space-y-6">
+                        <label class="flex items-center gap-4 cursor-pointer group">
+                            <input type="checkbox" ${state.policyAccepted[6] ? 'checked' : ''} onchange="state.policyAccepted[6] = this.checked; renderPolicy()" class="policy-checkbox">
+                            <span class="text-sm font-bold text-slate-800 group-hover:text-fintech-royal transition-colors">Confirmo e concordo com todos os termos acima.</span>
+                        </label>
                         
-                        <div class="space-y-4 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                        <button onclick="setState({policyStep: 7})" ${!state.policyAccepted[6] ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-200 active:scale-95 disabled:opacity-30">
+                            CONTINUAR PARA OS DADOS <i data-lucide="chevron-right" class="lucide-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else if (state.policyStep === POLICY_STEPS.length + 1) {
+            // Form Screen
+            stepContent = `
+                <div class="flex-1 flex flex-col pt-10">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-black text-slate-800 tracking-tight mb-2">PREENCHIMENTO DE DADOS</h2>
+                        <div class="policy-progress-bar mt-4">
+                            <div class="policy-progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 mb-6">
+                        <p class="text-slate-600 font-medium leading-relaxed mb-6">
+                            Insira suas informações para finalização do envio seguro ao credor:
+                        </p>
+                        
+                        <div class="space-y-4">
                             <input id="policy-name" type="text" placeholder="Nome Completo" value="${state.policyForm.name}" oninput="handlePolicyInput('name', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
                             <input id="policy-cpf" type="text" placeholder="CPF" value="${state.policyForm.cpf}" oninput="handlePolicyInput('cpf', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
                             <input id="policy-phone" type="tel" placeholder="Telefone" value="${state.policyForm.phone}" oninput="handlePolicyInput('phone', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
@@ -1028,14 +1057,14 @@ const renderPolicy = () => {
                         O compromisso começa antes da assinatura.
                     </p>
                     
-                    <button onclick="setState({showPolicy: false, policyStep: 0, policyAccepted: [false, false, false, false, false, false], policyForm: { name: '', cpf: '', phone: '', email: '', resRua: '', resBairro: '', resNumero: '', resCep: '', trabRua: '', trabBairro: '', trabNumero: '', trabCep: '' }})" class="mt-12 w-full max-w-[200px] border-2 border-slate-200 text-slate-400 py-3 rounded-xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">
+                    <button onclick="setState({showPolicy: false, policyStep: 0, policyAccepted: [false, false, false, false, false, false, false], policyForm: { name: '', cpf: '', phone: '', email: '', resRua: '', resBairro: '', resNumero: '', resCep: '', trabRua: '', trabBairro: '', trabNumero: '', trabCep: '' }})" class="mt-12 w-full max-w-[200px] border-2 border-slate-200 text-slate-400 py-3 rounded-xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">
                         FECHAR
                     </button>
                 </div>
             `;
         }
 
-        const isSuccessScreen = state.policyStep > POLICY_STEPS.length;
+        const isSuccessScreen = state.policyStep > POLICY_STEPS.length + 1;
 
         overlay.innerHTML = `
             <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-white">
