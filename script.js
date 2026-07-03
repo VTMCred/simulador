@@ -499,7 +499,7 @@ const render = () => {
             <div class="flex flex-col gap-4 py-2 step-transition opacity-100">
                 <div class="text-center mb-1">
                     <p class="text-slate-500 font-medium leading-tight">
-                        Simule agora e veja<br>suas opções em segundos
+                        Simule agora e veja<br>suas opções em segundos!
                     </p>
                 </div>
                 <div class="grid grid-cols-1 gap-4">
