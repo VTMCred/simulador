@@ -699,7 +699,11 @@
             showPolicy: false,
             policyStep: 0,
             policyAccepted: [false, false, false, false, false, false],
-            policyForm: { name: '', cpf: '', phone: '', email: '' },
+            policyForm: { 
+                name: '', cpf: '', phone: '', email: '',
+                resRua: '', resBairro: '', resNumero: '', resCep: '',
+                trabRua: '', trabBairro: '', trabNumero: '', trabCep: ''
+            },
             policyFinalizing: false
         };
 
@@ -729,7 +733,7 @@
                 text: `<ul class="space-y-3">
                         <li class="flex gap-2"><span>•</span> <span>Parcelas com vencimento a cada 30 dias</span></li>
                         <li class="flex gap-2"><span>•</span> <span>Alterações de data podem gerar ajuste no valor</span></li>
-                        <li class="flex gap-2"><span>•</span> <span>Antecipações não geram desconto</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Antecipações só geram desconto se pago 15 dias antes da data de vencimento</span></li>
                        </ul>`,
                 footer: "O acordo firmado define o relacionamento entre as partes.",
                 checkbox: "Li e concordo com as condições."
@@ -737,10 +741,8 @@
             {
                 title: "RESPONSABILIDADE SOBRE PRAZOS",
                 text: `<ul class="space-y-3">
-                        <li class="flex gap-2"><span>•</span> <span>Multa diária de R$15,00 em caso de atraso</span></li>
-                        <li class="flex gap-2"><span>•</span> <span>Após 20 dias, poderá ocorrer vencimento antecipado da operação</span></li>
-                        <li class="flex gap-2"><span>•</span> <span>O débito poderá ser exigido integralmente</span></li>
-                        <li class="flex gap-2"><span>•</span> <span>Medidas serão adotadas para recuperação do crédito</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Multa DIÁRIA proporcional a sua parcela será cobrada em caso de atraso</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Persistindo o atraso em mais de 50 dias, medidas serão tomadas para recuperação do valor emprestado</span></li>
                        </ul>`,
                 footer: "Compromissos cumpridos mantêm o relacionamento ativo.",
                 checkbox: "Estou ciente das condições em caso de atraso."
@@ -748,16 +750,12 @@
             {
                 title: "DOCUMENTAÇÃO NECESSÁRIA",
                 text: `<ul class="space-y-3">
-                        <li class="flex gap-2"><span>•</span> <span>RG ou CNH</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Foto do RG ou CNH</span></li>
                         <li class="flex gap-2"><span>•</span> <span>Foto segurando RG ou CNH ao lado do rosto</span></li>
                         <li class="flex gap-2"><span>•</span> <span>Comprovante de residência atualizado</span></li>
-                        <li class="flex flex-col pl-4 text-xs text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                            <span class="font-bold mb-1">• Se não estiver no seu nome, enviar:</span>
-                            <span class="pl-2">- Foto da frente da residência</span>
-                            <span class="pl-2">- Foto sua na frente da residência</span>
-                        </li>
+                        <li class="flex gap-2"><span>•</span> <span>Foto da frente da residência, deve aparecer o numero da casa</span></li>
                         <li class="flex gap-2"><span>•</span> <span>Endereço da empresa onde trabalha</span></li>
-                        <li class="flex gap-2"><span>•</span> <span>Contato de dois parentes (serão usados apenas em caso necessário)</span></li>
+                        <li class="flex gap-2"><span>•</span> <span>Contato de dois parentes (serão usados apenas caso você perca/troque o número)</span></li>
                         <li class="flex gap-2"><span>•</span> <span>E-mail para assinatura</span></li>
                        </ul>`,
                 footer: "As informações serão utilizadas exclusivamente para formalização da operação.",
@@ -883,14 +881,29 @@
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         };
 
+        const maskCEP = (val) => {
+            let value = val.replace(/\D/g, "");
+            value = value.substring(0, 8);
+            value = value.replace(/^(\d{5})(\d)/, "$1-$2");
+            return value;
+        };
+
         const updatePolicyForm = () => {
-            const { name, cpf, phone, email } = state.policyForm;
+            const { name, cpf, phone, email, resRua, resBairro, resNumero, resCep, trabRua, trabBairro, trabNumero, trabCep } = state.policyForm;
             const btn = document.getElementById('policy-final-submit-btn');
             if (btn) {
                 const isValid = name.trim().length > 3 && 
                                 cpf.length === 14 && 
                                 phone.length >= 14 && 
-                                validateEmail(email);
+                                validateEmail(email) &&
+                                resRua && resRua.trim().length > 0 &&
+                                resBairro && resBairro.trim().length > 0 &&
+                                resNumero && resNumero.trim().length > 0 &&
+                                resCep && resCep.length === 9 &&
+                                trabRua && trabRua.trim().length > 0 &&
+                                trabBairro && trabBairro.trim().length > 0 &&
+                                trabNumero && trabNumero.trim().length > 0 &&
+                                trabCep && trabCep.length === 9;
                 btn.disabled = state.policyFinalizing || !isValid;
             }
         };
@@ -903,6 +916,8 @@
                 val = maskCPF(val);
             } else if (field === 'phone') {
                 val = maskPhone(val);
+            } else if (field === 'resCep' || field === 'trabCep') {
+                val = maskCEP(val);
             }
             
             el.value = val;
@@ -1465,16 +1480,40 @@
                                     <li class="flex gap-3 items-center"><i data-lucide="check" class="text-fintech-royal w-5 h-5"></i> Assume responsabilidade pelos compromissos firmados</li>
                                 </ul>
                                 
-                                <div class="space-y-4">
+                                <div class="space-y-4 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
                                     <input id="policy-name" type="text" placeholder="Nome Completo" value="${state.policyForm.name}" oninput="handlePolicyInput('name', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
                                     <input id="policy-cpf" type="text" placeholder="CPF" value="${state.policyForm.cpf}" oninput="handlePolicyInput('cpf', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
                                     <input id="policy-phone" type="tel" placeholder="Telefone" value="${state.policyForm.phone}" oninput="handlePolicyInput('phone', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
                                     <input id="policy-email" type="email" placeholder="E-mail" value="${state.policyForm.email}" oninput="handlePolicyInput('email', this)" onblur="if(!validateEmail(this.value)) this.classList.add('erro-input'); else this.classList.remove('erro-input')" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                    
+                                    <div class="border-t border-slate-100 pt-4 mt-4 text-left">
+                                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Endereço Residencial</p>
+                                        <div class="grid grid-cols-1 gap-3">
+                                            <input id="policy-res-rua" type="text" placeholder="Rua / Avenida" value="${state.policyForm.resRua || ''}" oninput="handlePolicyInput('resRua', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                            <div class="grid grid-cols-2 gap-2">
+                                                <input id="policy-res-bairro" type="text" placeholder="Bairro" value="${state.policyForm.resBairro || ''}" oninput="handlePolicyInput('resBairro', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                                <input id="policy-res-numero" type="text" placeholder="Número" value="${state.policyForm.resNumero || ''}" oninput="handlePolicyInput('resNumero', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                            </div>
+                                            <input id="policy-res-cep" type="text" placeholder="CEP" value="${state.policyForm.resCep || ''}" oninput="handlePolicyInput('resCep', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4 mt-4 text-left">
+                                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Endereço de Trabalho</p>
+                                        <div class="grid grid-cols-1 gap-3">
+                                            <input id="policy-trab-rua" type="text" placeholder="Rua / Avenida (Trabalho)" value="${state.policyForm.trabRua || ''}" oninput="handlePolicyInput('trabRua', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                            <div class="grid grid-cols-2 gap-2">
+                                                <input id="policy-trab-bairro" type="text" placeholder="Bairro (Trabalho)" value="${state.policyForm.trabBairro || ''}" oninput="handlePolicyInput('trabBairro', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                                <input id="policy-trab-numero" type="text" placeholder="Número (Trabalho)" value="${state.policyForm.trabNumero || ''}" oninput="handlePolicyInput('trabNumero', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                            </div>
+                                            <input id="policy-trab-cep" type="text" placeholder="CEP (Trabalho)" value="${state.policyForm.trabCep || ''}" oninput="handlePolicyInput('trabCep', this)" class="policy-input" autocomplete="off" autocorrect="off" spellcheck="false">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
                             <div class="mt-auto">
-                                <button id="policy-final-submit-btn" onclick="handlePolicySubmit()" ${state.policyFinalizing || !state.policyForm.name || !state.policyForm.cpf || !state.policyForm.phone || !state.policyForm.email || !validateEmail(state.policyForm.email) ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-200 active:scale-95 disabled:opacity-30">
+                                <button id="policy-final-submit-btn" onclick="handlePolicySubmit()" ${state.policyFinalizing || !state.policyForm.name || !state.policyForm.cpf || !state.policyForm.phone || !state.policyForm.email || !validateEmail(state.policyForm.email) || !state.policyForm.resRua || !state.policyForm.resBairro || !state.policyForm.resNumero || !state.policyForm.resCep || state.policyForm.resCep.length !== 9 || !state.policyForm.trabRua || !state.policyForm.trabBairro || !state.policyForm.trabNumero || !state.policyForm.trabCep || state.policyForm.trabCep.length !== 9 ? 'disabled' : ''} class="w-full bg-fintech-btn text-white py-5 rounded-xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-200 active:scale-95 disabled:opacity-30">
                                     ${state.policyFinalizing ? '<div class="spinner-modern !w-5 !h-5 !border-2"></div> PROCESSANDO...' : 'ENVIAR PARA O CREDOR'}
                                 </button>
                                 
@@ -1498,7 +1537,7 @@
                                 O compromisso começa antes da assinatura.
                             </p>
                             
-                            <button onclick="setState({showPolicy: false, policyStep: 0, policyAccepted: [false, false, false, false, false, false], policyForm: { name: '', cpf: '', phone: '', email: '' }})" class="mt-12 w-full max-w-[200px] border-2 border-slate-200 text-slate-400 py-3 rounded-xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">
+                            <button onclick="setState({showPolicy: false, policyStep: 0, policyAccepted: [false, false, false, false, false, false], policyForm: { name: '', cpf: '', phone: '', email: '', resRua: '', resBairro: '', resNumero: '', resCep: '', trabRua: '', trabBairro: '', trabNumero: '', trabCep: '' }})" class="mt-12 w-full max-w-[200px] border-2 border-slate-200 text-slate-400 py-3 rounded-xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">
                                 FECHAR
                             </button>
                         </div>
@@ -1569,8 +1608,8 @@
         };
 
         const handlePolicySubmit = () => {
-            const { name, cpf, phone, email } = state.policyForm;
-            if (!name || !cpf || !phone || !email) {
+            const { name, cpf, phone, email, resRua, resBairro, resNumero, resCep, trabRua, trabBairro, trabNumero, trabCep } = state.policyForm;
+            if (!name || !cpf || !phone || !email || !resRua || !resBairro || !resNumero || !resCep || !trabRua || !trabBairro || !trabNumero || !trabCep) {
                 alert("Por favor, preencha todos os campos obrigatórios.");
                 return;
             }
@@ -1580,6 +1619,13 @@
             const now = new Date();
             const dateStr = now.toLocaleString('pt-BR');
 
+            const uName = name.toUpperCase().trim();
+            const uCpf = cpf.toUpperCase().trim();
+            const uPhone = phone.toUpperCase().trim();
+            const uEmail = email.toUpperCase().trim();
+            const uRes = `Rua ${resRua}, Bairro ${resBairro}, Nº ${resNumero}, CEP ${resCep}`.toUpperCase().trim();
+            const uTrab = `Rua ${trabRua}, Bairro ${trabBairro}, Nº ${trabNumero}, CEP ${trabCep}`.toUpperCase().trim();
+
             const msg = `*CÓDIGO VTMCRED — ACEITAÇÃO DE TERMOS*\n\n` +
                         `Eu, *${name.toUpperCase()}*, portador do CPF *${cpf}*, declaro que li as políticas de relacionamento financeiro do VTMCred e aceito integralmente os termos conforme detalhado abaixo:\n\n` +
                         
@@ -1587,19 +1633,21 @@
                         
                         `*2. ANÁLISE DA OPERAÇÃO:* Estou ciente de que o atendimento é destinado a clientes CLT e que meu contracheque será utilizado para análise de perfil. Compreendo que após a análise, será enviado o valor disponível. Aceito que a taxa mensal é fixa a depender do valor e entendo que a continuidade da operação depende da total veracidade das informações que enviei. *ACEITO E CONCORDO COM AS CONDIÇÕES DE ANÁLISE.*\n\n` +
                         
-                        `*3. CONDIÇÕES DA OPERAÇÃO:* Eu concordo que as parcelas terão vencimento a cada 30 dias. Entendo que alterações de data podem gerar ajuste no valor e estou ciente de que antecipações não geram desconto. *ACEITO AS CONDIÇÕES DA OPERAÇÃO.*\n\n` +
+                        `*3. CONDIÇÕES DA OPERAÇÃO:* Eu concordo que as parcelas terão vencimento a cada 30 dias. Entendo que alterações de data podem gerar ajuste no valor e estou ciente de que antecipações só geram desconto se pago 15 dias antes da data de vencimento. *ACEITO AS CONDIÇÕES DA OPERAÇÃO.*\n\n` +
                         
-                        `*4. RESPONSABILIDADE SOBRE PRAZOS:* Eu assumo a responsabilidade sobre os prazos e estou totalmente ciente da multa diária de R$ 15,00 em caso de atraso. Entendo que após 20 dias poderá ocorrer o vencimento antecipado da operação, podendo o débito ser exigido integralmente e medidas serão adotadas para recuperação do crédito. *ESTOU CIENTE E ACEITO AS RESPONSABILIDADES SOBRE ATRASOS.*\n\n` +
+                        `*4. RESPONSABILIDADE SOBRE PRAZOS:* Eu assumo a responsabilidade sobre os prazos e estou totalmente ciente de que multa DIÁRIA proporcional a minha parcela será cobrada em caso de atraso. Entendo que, persistindo o atraso em mais de 50 dias, medidas serão tomadas para recuperação do valor emprestado. *ESTOU CIENTE E ACEITO AS RESPONSABILIDADES SOBRE ATRASOS.*\n\n` +
                         
-                        `*5. DOCUMENTAÇÃO NECESSÁRIA:* Confirmo que possuo e enviarei RG ou CNH, foto segurando RG ou CNH ao lado do rosto, comprovante de residência atualizado (se não estiver no meu nome, enviarei foto da frente da residência e foto minha na frente da residência), endereço da empresa onde trabalho, contato de dois parentes (serão usados apenas em caso necessário) e e-mail para formalização. *ACEITO E CONFIRMO O ENVIO DA DOCUMENTAÇÃO COMPLETA.*\n\n` +
+                        `*5. DOCUMENTAÇÃO NECESSÁRIA:* Confirmo que possuo e enviarei foto do RG ou CNH, foto segurando RG ou CNH ao lado do rosto, comprovante de residência atualizado, foto da frente da residência (onde deve aparecer o número da casa), endereço da empresa onde trabalha, contato de dois parentes (serão usados apenas caso eu perca ou troque o número) e e-mail para assinatura. *ACEITO E CONFIRMO O ENVIO DA DOCUMENTAÇÃO COMPLETA.*\n\n` +
                         
                         `*6. FORMALIZAÇÃO:* Eu concordo com a formalização final através de assinatura digital da nota/promissória e validação dos dados. *CONCORDO COM A FORMALIZAÇÃO FINAL.*\n\n` +
                         
                         `*MEUS DADOS:*\n` +
-                        `Nome: ${name}\n` +
-                        `CPF: ${cpf}\n` +
-                        `Telefone: ${phone}\n` +
-                        `E-mail: ${email}\n\n` +
+                        `Nome: \`${uName}\`\n` +
+                        `CPF: \`${uCpf}\`\n` +
+                        `Telefone: \`${uPhone}\`\n` +
+                        `E-mail: \`${uEmail}\`\n` +
+                        `Endereço Residencial: \`${uRes}\`\n` +
+                        `Endereço Comercial/Trabalho: \`${uTrab}\`\n\n` +
                         `*Data/Hora do Aceite:* ${dateStr}\n\n` +
                         `_Registro individual de aceitação realizado via plataforma VTMCred._`;
 
