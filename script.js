@@ -523,7 +523,17 @@ const render = () => {
                         </div>
                         <i data-lucide="chevron-right" class="text-slate-300 lucide-small"></i>
                     </button>
-                    <div class="animate-fade-up delay-300 bg-slate-100 p-6 rounded-2xl border border-dashed border-slate-300 flex items-center gap-5 text-left opacity-60">
+                    <a href="https://vtmcred.github.io/locacoes/" target="_blank" class="animate-fade-up delay-300 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 text-left transition-all active:scale-95 group hover:border-fintech-royal">
+                        <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                            <i data-lucide="box" class="lucide-large"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-black text-lg text-slate-800">Locação de Itens</h3>
+                            <p class="text-sm text-slate-500 font-medium">Alugue equipamentos e itens de forma simples.</p>
+                        </div>
+                        <i data-lucide="chevron-right" class="text-slate-300 lucide-small group-hover:text-fintech-royal transition-colors"></i>
+                    </a>
+                    <div class="animate-fade-up delay-400 bg-slate-100 p-6 rounded-2xl border border-dashed border-slate-300 flex items-center gap-5 text-left opacity-60">
                         <div class="w-14 h-14 bg-slate-200 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
                             <i data-lucide="layout-grid" class="lucide-large"></i>
                         </div>
@@ -534,7 +544,7 @@ const render = () => {
                         <i data-lucide="lock" class="text-slate-300 lucide-small"></i>
                     </div>
                 </div>
-                <div class="animate-fade-up delay-400 text-center mt-4 flex flex-col items-center gap-5">
+                <div class="animate-fade-up delay-500 text-center mt-4 flex flex-col items-center gap-5">
                     <button onclick="setState({showPolicy: true, policyStep: 0})" class="text-fintech-royal text-[10px] font-bold uppercase tracking-widest hover:opacity-80 transition-opacity active:scale-95">
                         Política de Relacionamento Financeiro
                     </button>
